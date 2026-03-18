@@ -1,33 +1,35 @@
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import { AuthProvider } from "@/components/AuthProvider";
+import { Playfair_Display, DM_Sans } from 'next/font/google'
+import './globals.css'
+import { AuthProvider } from '@/components/AuthProvider'
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+const playfair = Playfair_Display({
+  subsets: ['latin'],
+  weight: ['400', '500', '700'],
+  style: ['normal', 'italic'],
+  variable: '--font-playfair',
+  display: 'swap',
+})
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const dmSans = DM_Sans({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600'],
+  variable: '--font-dm-sans',
+  display: 'swap',
+})
 
 export const metadata = {
-  title: "FishMarket — Buy & Sell Fishing Gear",
-  description: "The marketplace for fishing gear. Buy and sell used rods, reels, lures, boats and more.",
-};
+  title: 'Seaitall — The Amazon of Fishing',
+  description: 'Buy and sell fishing gear, find charters, book guides, and learn to fish. Seaitall is the one stop shop for everything fishing.',
+}
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        style={{ background: '#0a0a0a', color: 'white', margin: 0, padding: 0 }}
-      >
+    <html lang="en" className={`${playfair.variable} ${dmSans.variable}`}>
+      <body>
         <AuthProvider>
           {children}
         </AuthProvider>
       </body>
     </html>
-  );
+  )
 }

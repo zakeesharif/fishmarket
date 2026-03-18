@@ -17,70 +17,37 @@ export default function SignupPage() {
   const handleSignup = async (e) => {
     e.preventDefault()
     setError('')
-
-    if (password !== confirm) {
-      setError('Passwords do not match')
-      return
-    }
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters')
-      return
-    }
-
+    if (password !== confirm) { setError('Passwords do not match'); return }
+    if (password.length < 6) { setError('Password must be at least 6 characters'); return }
     setLoading(true)
     const supabase = createClient()
-
     const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
-      },
+      email, password,
+      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
     })
-
-    if (error) {
-      setError(error.message)
-      setLoading(false)
-    } else {
-      setSuccess(true)
-    }
+    if (error) { setError(error.message); setLoading(false) }
+    else setSuccess(true)
   }
 
   if (success) {
     return (
-      <main style={{ fontFamily: 'sans-serif', background: '#0a0a0a', minHeight: '100vh', color: 'white', display: 'flex', flexDirection: 'column' }}>
+      <main style={{ background: '#0a1628', minHeight: '100vh', color: '#8fa3b8', display: 'flex', flexDirection: 'column', paddingTop: '60px' }}>
         <Navbar />
-        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px' }}>
-          <div style={{
-            background: '#111',
-            border: '1px solid #1a7f4f',
-            borderRadius: '20px',
-            padding: '48px',
-            width: '100%',
-            maxWidth: '420px',
-            textAlign: 'center',
-            boxSizing: 'border-box',
-          }}>
-            <div style={{ fontSize: '3rem', marginBottom: '16px' }}>📬</div>
-            <h2 style={{ fontSize: '1.6rem', fontWeight: '700', marginBottom: '12px', color: '#1a7f4f' }}>Check your email</h2>
-            <p style={{ color: '#aaa', fontSize: '15px', lineHeight: '1.6', marginBottom: '24px' }}>
-              We sent a confirmation link to <strong style={{ color: 'white' }}>{email}</strong>.
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '48px 24px' }}>
+          <div style={{ width: '100%', maxWidth: '400px', textAlign: 'center' }}>
+            <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'rgba(74,158,255,0.1)', border: '1px solid rgba(74,158,255,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4a9eff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
+            </div>
+            <h2 style={{ fontFamily: 'var(--font-playfair, serif)', fontSize: '1.8rem', fontWeight: '500', color: '#f8f9fa', marginBottom: '12px' }}>Check your email</h2>
+            <p style={{ fontFamily: 'var(--font-dm-sans, sans-serif)', color: '#8fa3b8', fontSize: '14px', lineHeight: '1.6', fontWeight: '300', marginBottom: '28px' }}>
+              We sent a confirmation link to{' '}
+              <strong style={{ color: '#f8f9fa', fontWeight: '500' }}>{email}</strong>.
               Click it to activate your account.
             </p>
-            <Link href="/auth/login">
-              <button style={{
-                background: 'transparent',
-                color: '#1a7f4f',
-                border: '1px solid #1a7f4f',
-                padding: '12px 28px',
-                borderRadius: '10px',
-                cursor: 'pointer',
-                fontSize: '15px',
-                fontWeight: '600',
-              }}>
-                Back to Login
-              </button>
-            </Link>
+            <Link href="/auth/login" className="btn-ghost">Back to Login</Link>
           </div>
         </div>
       </main>
@@ -88,135 +55,51 @@ export default function SignupPage() {
   }
 
   return (
-    <main style={{ fontFamily: 'sans-serif', background: '#0a0a0a', minHeight: '100vh', color: 'white', display: 'flex', flexDirection: 'column' }}>
+    <main style={{ background: '#0a1628', minHeight: '100vh', color: '#8fa3b8', display: 'flex', flexDirection: 'column', paddingTop: '60px' }}>
       <Navbar />
 
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px' }}>
-        <div style={{
-          background: '#111',
-          border: '1px solid #1a7f4f',
-          borderRadius: '20px',
-          padding: '48px',
-          width: '100%',
-          maxWidth: '420px',
-          boxSizing: 'border-box',
-        }}>
-          <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-            <div style={{ fontSize: '2.5rem', marginBottom: '12px' }}>🎣</div>
-            <h2 style={{ fontSize: '1.8rem', fontWeight: '700', margin: '0 0 8px' }}>Create account</h2>
-            <p style={{ color: '#666', margin: 0, fontSize: '14px' }}>Join thousands of fishing enthusiasts</p>
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '48px 24px' }}>
+        <div style={{ width: '100%', maxWidth: '400px' }}>
+
+          <div style={{ marginBottom: '40px' }}>
+            <h1 style={{ fontFamily: 'var(--font-playfair, serif)', fontSize: '2rem', fontWeight: '500', color: '#f8f9fa', marginBottom: '8px' }}>
+              Create account
+            </h1>
+            <p style={{ fontFamily: 'var(--font-dm-sans, sans-serif)', color: 'rgba(143,163,184,0.55)', fontSize: '14px', fontWeight: '300', margin: 0 }}>
+              Join thousands of fishing enthusiasts
+            </p>
           </div>
 
-          <form onSubmit={handleSignup}>
-            <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', color: '#aaa', marginBottom: '8px', fontSize: '13px', fontWeight: '500', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-                Email
-              </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                placeholder="your@email.com"
-                style={{
-                  width: '100%',
-                  background: '#0a0a0a',
-                  border: '1px solid #2a2a2a',
-                  borderRadius: '10px',
-                  padding: '14px 16px',
-                  color: 'white',
-                  fontSize: '15px',
-                  boxSizing: 'border-box',
-                  outline: 'none',
-                }}
-              />
+          <form onSubmit={handleSignup} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <div>
+              <label className="fm-label">Email</label>
+              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="your@email.com" className="fm-input" />
             </div>
 
-            <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', color: '#aaa', marginBottom: '8px', fontSize: '13px', fontWeight: '500', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-                Password
-              </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                placeholder="Min. 6 characters"
-                style={{
-                  width: '100%',
-                  background: '#0a0a0a',
-                  border: '1px solid #2a2a2a',
-                  borderRadius: '10px',
-                  padding: '14px 16px',
-                  color: 'white',
-                  fontSize: '15px',
-                  boxSizing: 'border-box',
-                  outline: 'none',
-                }}
-              />
+            <div>
+              <label className="fm-label">Password</label>
+              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required placeholder="Min. 6 characters" className="fm-input" />
             </div>
 
-            <div style={{ marginBottom: '28px' }}>
-              <label style={{ display: 'block', color: '#aaa', marginBottom: '8px', fontSize: '13px', fontWeight: '500', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-                Confirm Password
-              </label>
-              <input
-                type="password"
-                value={confirm}
-                onChange={(e) => setConfirm(e.target.value)}
-                required
-                placeholder="••••••••"
-                style={{
-                  width: '100%',
-                  background: '#0a0a0a',
-                  border: '1px solid #2a2a2a',
-                  borderRadius: '10px',
-                  padding: '14px 16px',
-                  color: 'white',
-                  fontSize: '15px',
-                  boxSizing: 'border-box',
-                  outline: 'none',
-                }}
-              />
+            <div>
+              <label className="fm-label">Confirm Password</label>
+              <input type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} required placeholder="••••••••" className="fm-input" />
             </div>
 
             {error && (
-              <div style={{
-                background: 'rgba(255, 60, 60, 0.08)',
-                border: '1px solid rgba(255, 60, 60, 0.3)',
-                borderRadius: '10px',
-                padding: '12px 16px',
-                marginBottom: '20px',
-                color: '#ff6b6b',
-                fontSize: '14px',
-              }}>
+              <div style={{ background: 'rgba(180,80,80,0.1)', border: '1px solid rgba(180,80,80,0.25)', borderRadius: '4px', padding: '11px 14px', color: 'rgba(220,100,100,0.9)', fontSize: '13px', fontFamily: 'var(--font-dm-sans, sans-serif)' }}>
                 {error}
               </div>
             )}
 
-            <button
-              type="submit"
-              disabled={loading}
-              style={{
-                width: '100%',
-                background: loading ? '#0f4f30' : '#1a7f4f',
-                color: 'white',
-                border: 'none',
-                padding: '15px',
-                borderRadius: '10px',
-                cursor: loading ? 'not-allowed' : 'pointer',
-                fontSize: '16px',
-                fontWeight: '600',
-                transition: 'background 0.2s',
-              }}
-            >
+            <button type="submit" disabled={loading} className="btn-primary" style={{ width: '100%', padding: '14px', opacity: loading ? 0.6 : 1, cursor: loading ? 'not-allowed' : 'pointer', border: 'none', marginTop: '8px' }}>
               {loading ? 'Creating account...' : 'Create Account'}
             </button>
           </form>
 
-          <p style={{ textAlign: 'center', color: '#555', marginTop: '28px', fontSize: '14px' }}>
+          <p style={{ fontFamily: 'var(--font-dm-sans, sans-serif)', textAlign: 'center', color: 'rgba(143,163,184,0.4)', marginTop: '28px', fontSize: '13px', fontWeight: '300' }}>
             Already have an account?{' '}
-            <Link href="/auth/login" style={{ color: '#1a7f4f', textDecoration: 'none', fontWeight: '600' }}>
+            <Link href="/auth/login" style={{ color: '#4a9eff', fontWeight: '400' }}>
               Sign in
             </Link>
           </p>

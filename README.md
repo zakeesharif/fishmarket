@@ -1,36 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Seaitall
+
+**The world's fishing marketplace.**
+
+Buy and sell fishing gear, find charters, book guides, and learn to fish — all in one place. Seaitall is the one stop shop for everything fishing.
+
+## What it is
+
+Seaitall is a full-stack fishing marketplace built on Next.js and Supabase. Fishermen can list used gear for sale, browse thousands of listings, find licensed captains, and book guided trips — without leaving the platform.
+
+## Stack
+
+- **Framework:** Next.js 16 (App Router)
+- **Database & Auth:** Supabase (Postgres + Row Level Security)
+- **Storage:** Supabase Storage (listing photos)
+- **Styling:** Tailwind CSS v4 + inline styles
+- **Fonts:** Playfair Display + DM Sans (Google Fonts)
+
+## Features
+
+- Email/password authentication with Supabase Auth
+- Gear listings with photo upload, category, condition, price, and location
+- Browse page with search and category filtering (Rods, Reels, Lures, Line, Tackle Boxes, Boats, Engines, Other)
+- Protected routes — only signed-in users can post listings
+- Mobile-first responsive layout with bottom navigation
 
 ## Getting Started
 
-First, run the development server:
+1. Clone the repo
+2. Copy `.env.local.example` to `.env.local` and add your Supabase credentials
+3. Run `supabase-schema.sql` in your Supabase SQL editor to create the `listings` table and storage bucket
+4. Install dependencies and run the dev server:
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## Supabase Setup
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+In your Supabase project:
 
-## Learn More
+1. Go to **SQL Editor** and run the contents of `supabase-schema.sql`
+2. Go to **Authentication → URL Configuration** and set the redirect URL to `http://localhost:3000/auth/callback`
+3. Copy your **Project URL** and **anon key** from **Settings → API** into `.env.local`
 
-To learn more about Next.js, take a look at the following resources:
+## Environment Variables
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Deploy
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Deploy to Vercel in one click. Add your environment variables in the Vercel dashboard and update your Supabase redirect URLs to include your production domain.
