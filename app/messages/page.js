@@ -1,5 +1,6 @@
 'use client'
 export const dynamic = 'force-dynamic'
+import { Suspense } from 'react'
 import { useState, useEffect, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
@@ -25,7 +26,7 @@ const IconUser = () => (
   </svg>
 )
 
-export default function MessagesPage() {
+function MessagesInner() {
   const { user, loading: authLoading } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -352,5 +353,13 @@ export default function MessagesPage() {
         )}
       </div>
     </main>
+  )
+}
+
+export default function MessagesPage() {
+  return (
+    <Suspense>
+      <MessagesInner />
+    </Suspense>
   )
 }
