@@ -156,7 +156,7 @@ function BrowsePageInner() {
       const supabase = createClient()
       let query = supabase
         .from('listings')
-        .select('id,title,price,condition,category,location,photo_url,created_at,user_id,seller_email', { count: 'exact' })
+        .select('id,title,price,condition,category,location,photo_url,created_at,user_id', { count: 'exact' })
 
       if (category !== 'All') query = query.eq('category', category)
       if (conditions.length > 0) query = query.in('condition', conditions)
@@ -175,7 +175,8 @@ function BrowsePageInner() {
 
       query = query.range(pageNum * PAGE_SIZE, (pageNum + 1) * PAGE_SIZE - 1)
       const { data, count, error } = await query
-      if (error) throw error
+      if (error) { console.error('Supabase error:', error); throw error }
+      console.log('First listing:', data?.[0])
 
       // Fetch usernames for sellers
       const userIds = [...new Set((data || []).map(l => l.user_id))]
