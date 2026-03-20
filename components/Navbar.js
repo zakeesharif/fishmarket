@@ -121,7 +121,7 @@ export default function Navbar() {
           <Link href="/browse" className="nav-link">Tackle</Link>
           <Link href="/browse?category=Boats" className="nav-link">Boats</Link>
           <Link href="/browse" className="nav-link">Charters</Link>
-          <Link href="/browse" className="nav-link">Learn</Link>
+          <Link href="/catches" className="nav-link">Catches</Link>
         </div>
 
         {/* Right: auth */}
@@ -129,6 +129,7 @@ export default function Navbar() {
           {!loading && (
             user ? (
               <>
+                <Link href="/catches/new" className="nav-link" style={{ color: '#c9a84c' }}>Log a Catch</Link>
                 <Link href="/listings/new" className="nav-link">Sell Gear</Link>
                 <Link href="/messages" className="nav-link" style={{ position: 'relative' }}>
                   Messages

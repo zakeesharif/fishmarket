@@ -9,9 +9,6 @@
 -- ============================================================
 
 -- ── Wipe any previous seed attempt ──────────────────────────
-delete from public.messages  where id::text like 'cccccccc%';
-delete from public.listings  where id::text like 'bbbbbbbb%';
-delete from public.profiles  where id::text like 'aaaaaaaa%';
 
 -- ── Bypass FK validation for seeding ────────────────────────
 SET session_replication_role = replica;
@@ -394,6 +391,61 @@ values
  'bbbbbbbb-0000-0000-0000-000000000026',
  'Real Gibbs sold me. I''ll take it. Can you ship to Tampa or locals only? Happy to cover freight.',
  false, now() - interval '1 day' - interval '1 hour');
+
+
+-- ── 4. Sample Catches ───────────────────────────────────────
+
+insert into public.catches
+  (id, user_id, species, weight_lbs, location, gear_used, photo_url, caption, created_at)
+values
+
+('dddddddd-0000-0000-0000-000000000001',
+ 'aaaaaaaa-0000-0000-0000-000000000001',
+ 'Striped Bass', 38.5, 'Montauk, NY',
+ 'Daiwa Saltiga 14'' + Van Staal VR75 spooled with 65lb braid',
+ null,
+ 'Fall run cow striper on a bunker chunk. 38.5 lbs on the Boga. Released after a quick photo. The Montauk Point rip was on fire at first light.',
+ now() - interval '2 days'),
+
+('dddddddd-0000-0000-0000-000000000002',
+ 'aaaaaaaa-0000-0000-0000-000000000002',
+ 'Bluefish', 12.0, 'Captree, NY',
+ 'Penn Battle III 5000 on a 9'' heavy spinning rod',
+ null,
+ 'Big chopper blue on a metal lip swimmer off the Captree inlet. 12 pounds of pure chaos. These things fight twice their weight.',
+ now() - interval '5 days'),
+
+('dddddddd-0000-0000-0000-000000000003',
+ 'aaaaaaaa-0000-0000-0000-000000000003',
+ 'False Albacore', 9.2, 'Cape Cod, MA',
+ 'Orvis Recon 9wt fly rod + Lamson Liquid reel, 30lb fluorocarbon leader',
+ null,
+ 'Albie on a white Hogy epoxy jig. These fish are the fastest thing in the ocean — peeled 100 yards of backing in about 4 seconds. Pure joy on the fly rod.',
+ now() - interval '8 days'),
+
+('dddddddd-0000-0000-0000-000000000004',
+ 'aaaaaaaa-0000-0000-0000-000000000005',
+ 'Snook', 28.0, 'Tampa Bay, FL',
+ 'Shimano Stradic FL 4000 on a 7''6" Teramar MH',
+ null,
+ 'Slot snook on a live pinfish under the bridge lights at midnight. Tampa Bay inshore fishing at its finest. Measured 34 inches — perfect size.',
+ now() - interval '12 days'),
+
+('dddddddd-0000-0000-0000-000000000005',
+ 'aaaaaaaa-0000-0000-0000-000000000004',
+ 'Mahi-Mahi', 22.5, 'Miami, FL',
+ 'Shimano Talica 16 on a heavy spinning setup, 40lb braid',
+ null,
+ 'Bull mahi on a Shimano Butterfly flat-fall jig in 300 feet. Color absolutely lit up when it hit the surface. Best eating fish in the ocean.',
+ now() - interval '3 days'),
+
+('dddddddd-0000-0000-0000-000000000006',
+ 'aaaaaaaa-0000-0000-0000-000000000009',
+ 'Yellowfin Tuna', 54.0, 'San Diego, CA',
+ 'Okuma Cedros CJ-60S with 60lb braid on a 6''6" jig rod',
+ null,
+ 'Big YFT on the iron at the Coronado Islands. Running iron in the kelp paddy bite — 54 pounds dressed out. These fish are something else on the fast iron.',
+ now() - interval '15 days');
 
 
 -- ── Restore FK enforcement ───────────────────────────────────

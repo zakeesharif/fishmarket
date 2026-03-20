@@ -5,6 +5,17 @@ import Navbar from '@/components/Navbar'
 import { createClient } from '@/lib/supabase/client'
 
 const CATEGORIES = ['All', 'Rods', 'Reels', 'Lures', 'Line', 'Tackle Boxes', 'Boats', 'Engines', 'Other']
+
+const CATEGORY_PHOTOS = {
+  'Rods':         'https://source.unsplash.com/400x300/?fishing,rod,angling',
+  'Reels':        'https://source.unsplash.com/400x300/?fishing,reel,spinning',
+  'Lures':        'https://source.unsplash.com/400x300/?fishing,lure,bait',
+  'Line':         'https://source.unsplash.com/400x300/?fishing,line,cast,saltwater',
+  'Tackle Boxes': 'https://source.unsplash.com/400x300/?fishing,tackle,gear',
+  'Boats':        'https://source.unsplash.com/400x300/?fishing,boat,ocean,water',
+  'Engines':      'https://source.unsplash.com/400x300/?boat,marine,outboard',
+  'Other':        'https://source.unsplash.com/400x300/?fishing,ocean,saltwater',
+}
 const CONDITIONS = ['New', 'Like New', 'Good', 'Fair', 'Poor']
 
 const CONDITION_COLORS = {
@@ -61,6 +72,12 @@ function ListingCard({ listing }) {
       <div style={{ width: '100%', height: '192px', background: '#0a1628', overflow: 'hidden', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         {listing.photo_url ? (
           <img src={listing.photo_url} alt={listing.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        ) : CATEGORY_PHOTOS[listing.category] ? (
+          <img
+            src={CATEGORY_PHOTOS[listing.category]}
+            alt={listing.category}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.7) saturate(0.85)' }}
+          />
         ) : (
           <span style={{ color: 'rgba(74,158,255,0.15)' }}><IconPhoto /></span>
         )}
