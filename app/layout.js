@@ -1,6 +1,7 @@
 import { Playfair_Display, DM_Sans } from 'next/font/google'
 import './globals.css'
 import { AuthProvider } from '@/components/AuthProvider'
+import { ToastProvider } from '@/components/Toast'
 
 const playfair = Playfair_Display({
   subsets: ['latin'],
@@ -18,8 +19,18 @@ const dmSans = DM_Sans({
 })
 
 export const metadata = {
-  title: 'Seaitall — The Amazon of Fishing',
-  description: 'Buy and sell fishing gear, find charters, book guides, and learn to fish. Seaitall is the one stop shop for everything fishing.',
+  metadataBase: new URL('https://seaitall.com'),
+  title: {
+    default: 'Seaitall — The World\'s Fishing Marketplace',
+    template: '%s — Seaitall',
+  },
+  description: 'Buy and sell fishing gear, find charters, book guides, and log your catches. Seaitall is the world\'s fishing marketplace.',
+  openGraph: {
+    siteName: 'Seaitall',
+    type: 'website',
+    images: [{ url: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200&auto=format&fit=crop' }],
+  },
+  twitter: { card: 'summary_large_image' },
 }
 
 export default function RootLayout({ children }) {
@@ -27,7 +38,9 @@ export default function RootLayout({ children }) {
     <html lang="en" className={`${playfair.variable} ${dmSans.variable}`}>
       <body>
         <AuthProvider>
-          {children}
+          <ToastProvider>
+            {children}
+          </ToastProvider>
         </AuthProvider>
       </body>
     </html>

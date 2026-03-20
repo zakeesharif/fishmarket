@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 
 export default function LatestCatches() {
@@ -20,13 +21,11 @@ export default function LatestCatches() {
 
       const userIds = [...new Set(data.map((c) => c.user_id))]
       const { data: profiles } = await supabase
-        .from('profiles')
-        .select('id, username')
-        .in('id', userIds)
+        .from('profiles').select('id, username, avatar_url').in('id', userIds)
       const profileMap = {}
-      if (profiles) profiles.forEach((p) => { profileMap[p.id] = p.username })
+      if (profiles) profiles.forEach((p) => { profileMap[p.id] = p })
 
-      setCatches(data.map((c) => ({ ...c, username: profileMap[c.user_id] || 'Angler' })))
+      setCatches(data.map((c) => ({ ...c, profile: profileMap[c.user_id] || null })))
       setLoaded(true)
     }
     load()
@@ -36,68 +35,45 @@ export default function LatestCatches() {
 
   return (
     <section style={{ padding: '80px 48px', borderTop: '1px solid #162a4a' }}>
-      <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '40px', flexWrap: 'wrap', gap: '16px' }}>
           <div>
-            <p style={{ fontFamily: 'var(--font-dm-sans, sans-serif)', fontSize: '11px', fontWeight: '500', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(143,163,184,0.4)', margin: '0 0 10px' }}>
-              Community
-            </p>
-            <h2 style={{ fontFamily: 'var(--font-playfair, serif)', fontSize: '2rem', fontWeight: '400', color: '#f8f9fa', margin: 0, letterSpacing: '-0.01em' }}>
-              Latest Catches
-            </h2>
+            <p style={{ fontFamily: 'var(--font-dm-sans, sans-serif)', fontSize: '11px', fontWeight: '500', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(143,163,184,0.4)', margin: '0 0 10px' }}>Community</p>
+            <h2 style={{ fontFamily: 'var(--font-playfair, serif)', fontSize: '2rem', fontWeight: '400', color: '#f8f9fa', margin: 0, letterSpacing: '-0.01em' }}>Latest Catches</h2>
           </div>
-          <Link href="/catches" style={{ fontFamily: 'var(--font-dm-sans, sans-serif)', fontSize: '12px', fontWeight: '500', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(143,163,184,0.4)', display: 'inline-flex', alignItems: 'center', gap: '8px', transition: 'color 0.15s' }}
+          <Link href="/catches" style={{ fontFamily: 'var(--font-dm-sans, sans-serif)', fontSize: '12px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(143,163,184,0.4)', display: 'inline-flex', alignItems: 'center', gap: '6px', transition: 'color 0.15s' }}
             onMouseEnter={(e) => e.currentTarget.style.color = '#c9a84c'}
             onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(143,163,184,0.4)'}
           >
-            View all
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
-            </svg>
+            View all <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
           </Link>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '20px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '20px' }}>
           {catches.map((c) => (
-            <Link key={c.id} href="/catches" style={{ textDecoration: 'none', display: 'block' }}>
-              <div
-                style={{ background: '#0f2040', border: '1px solid #162a4a', borderRadius: '6px', overflow: 'hidden', transition: 'border-color 0.2s' }}
-                onMouseEnter={(e) => e.currentTarget.style.borderColor = 'rgba(201,168,76,0.3)'}
-                onMouseLeave={(e) => e.currentTarget.style.borderColor = '#162a4a'}
-              >
-                <div style={{ width: '100%', height: '200px', position: 'relative', overflow: 'hidden', background: '#0a1628' }}>
+            <Link key={c.id} href={`/catches/${c.id}`} style={{ textDecoration: 'none', display: 'block' }}>
+              <div className="listing-card">
+                <div style={{ position: 'relative', height: '220px', overflow: 'hidden', background: '#0a1628' }}>
                   {c.photo_url ? (
-                    <img src={c.photo_url} alt={c.species} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <Image src={c.photo_url} alt={c.species} fill sizes="300px" style={{ objectFit: 'cover', transition: 'transform 0.4s ease' }} />
                   ) : (
-                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #0a1628, #0f2040)', color: 'rgba(201,168,76,0.08)', fontSize: '64px' }}>
-                      🎣
-                    </div>
+                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #0a1628, #0f2040)', color: 'rgba(201,168,76,0.06)', fontSize: '64px' }}>🎣</div>
                   )}
                   {c.weight_lbs && (
-                    <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(10,22,40,0.85)', backdropFilter: 'blur(4px)', border: '1px solid rgba(201,168,76,0.3)', padding: '3px 10px', borderRadius: '2px', fontFamily: 'var(--font-playfair, serif)', fontSize: '13px', color: '#c9a84c', fontWeight: '500' }}>
+                    <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(10,22,40,0.88)', backdropFilter: 'blur(6px)', border: '1px solid rgba(201,168,76,0.3)', padding: '4px 10px', borderRadius: '2px', fontFamily: 'var(--font-playfair, serif)', fontSize: '13px', color: '#c9a84c' }}>
                       {c.weight_lbs} lbs
                     </div>
                   )}
                 </div>
-
                 <div style={{ padding: '16px 18px 18px' }}>
-                  <h3 style={{ fontFamily: 'var(--font-playfair, serif)', fontSize: '1rem', fontWeight: '500', color: '#f8f9fa', margin: '0 0 6px', letterSpacing: '-0.01em' }}>
-                    {c.species}
-                  </h3>
-                  {c.caption && (
-                    <p style={{ fontFamily: 'var(--font-dm-sans, sans-serif)', fontSize: '12px', color: 'rgba(143,163,184,0.55)', margin: '0 0 10px', lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', fontWeight: '300' }}>
-                      {c.caption}
-                    </p>
-                  )}
+                  <h3 style={{ fontFamily: 'var(--font-playfair, serif)', fontSize: '1rem', fontWeight: '500', color: '#f8f9fa', margin: '0 0 6px' }}>{c.species}</h3>
+                  {c.caption && <p className="truncate-2" style={{ fontFamily: 'var(--font-dm-sans, sans-serif)', fontSize: '12px', color: 'rgba(143,163,184,0.5)', margin: '0 0 10px', lineHeight: 1.5, fontWeight: '300' }}>{c.caption}</p>}
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontFamily: 'var(--font-dm-sans, sans-serif)', fontSize: '11px', color: 'rgba(143,163,184,0.4)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      {c.location && <>
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                        {c.location}
-                      </>}
+                    <span style={{ fontFamily: 'var(--font-dm-sans, sans-serif)', fontSize: '11px', color: 'rgba(143,163,184,0.35)' }}>
+                      {c.location && `📍 ${c.location}`}
                     </span>
                     <span style={{ fontFamily: 'var(--font-dm-sans, sans-serif)', fontSize: '11px', color: 'rgba(143,163,184,0.3)' }}>
-                      {c.username}
+                      {c.profile?.username || 'Angler'}
                     </span>
                   </div>
                 </div>

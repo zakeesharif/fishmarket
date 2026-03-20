@@ -1,451 +1,425 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { Suspense } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import Navbar from '@/components/Navbar'
 import { createClient } from '@/lib/supabase/client'
+import { useAuth } from '@/components/AuthProvider'
+import { useToast } from '@/components/Toast'
 
-const CATEGORIES = ['All', 'Rods', 'Reels', 'Lures', 'Line', 'Tackle Boxes', 'Boats', 'Engines', 'Other']
-
+const UNSPLASH = (id) => `https://images.unsplash.com/${id}?w=600&auto=format&fit=crop`
 const CATEGORY_PHOTOS = {
-  'Rods':         'https://source.unsplash.com/400x300/?fishing,rod,angling',
-  'Reels':        'https://source.unsplash.com/400x300/?fishing,reel,spinning',
-  'Lures':        'https://source.unsplash.com/400x300/?fishing,lure,bait',
-  'Line':         'https://source.unsplash.com/400x300/?fishing,line,cast,saltwater',
-  'Tackle Boxes': 'https://source.unsplash.com/400x300/?fishing,tackle,gear',
-  'Boats':        'https://source.unsplash.com/400x300/?fishing,boat,ocean,water',
-  'Engines':      'https://source.unsplash.com/400x300/?boat,marine,outboard',
-  'Other':        'https://source.unsplash.com/400x300/?fishing,ocean,saltwater',
+  'Rods':         UNSPLASH('photo-1544551763-46a013bb70d5'),
+  'Reels':        UNSPLASH('photo-1571019613454-1cb2f99b2d8b'),
+  'Lures':        UNSPLASH('photo-1578662996442-48f60103fc96'),
+  'Boats':        UNSPLASH('photo-1567899378494-47b22a2ae96a'),
+  'Engines':      UNSPLASH('photo-1558618666-fcd25c85cd64'),
+  'Tackle Boxes': UNSPLASH('photo-1544551763-46a013bb70d5'),
+  'Line':         UNSPLASH('photo-1544551763-46a013bb70d5'),
+  'Other':        UNSPLASH('photo-1544551763-46a013bb70d5'),
 }
-const CONDITIONS = ['New', 'Like New', 'Good', 'Fair', 'Poor']
-
+const CATEGORIES = ['All','Rods','Reels','Lures','Line','Tackle Boxes','Boats','Engines','Other']
+const CONDITIONS = ['New','Like New','Good','Fair','Poor']
+const SORTS = [
+  { value: 'newest',    label: 'Newest First' },
+  { value: 'price_asc', label: 'Price: Low to High' },
+  { value: 'price_desc',label: 'Price: High to Low' },
+  { value: 'views',     label: 'Most Viewed' },
+  { value: 'saves',     label: 'Most Saved' },
+]
 const CONDITION_COLORS = {
-  'New':      { bg: 'rgba(74,158,255,0.12)', text: '#4a9eff', border: 'rgba(74,158,255,0.25)' },
-  'Like New': { bg: 'rgba(74,158,255,0.08)', text: 'rgba(74,158,255,0.8)', border: 'rgba(74,158,255,0.18)' },
-  'Good':     { bg: 'rgba(201,168,76,0.1)',  text: '#c9a84c', border: 'rgba(201,168,76,0.25)' },
-  'Fair':     { bg: 'rgba(200,160,80,0.08)', text: 'rgba(200,160,80,0.8)', border: 'rgba(200,160,80,0.2)' },
-  'Poor':     { bg: 'rgba(180,80,80,0.1)',   text: 'rgba(220,100,100,0.9)', border: 'rgba(180,80,80,0.25)' },
+  'New':      { bg: 'rgba(74,158,255,0.12)', text: '#4a9eff', border: 'rgba(74,158,255,0.2)' },
+  'Like New': { bg: 'rgba(74,158,255,0.08)', text: 'rgba(74,158,255,0.8)', border: 'rgba(74,158,255,0.15)' },
+  'Good':     { bg: 'rgba(201,168,76,0.1)',  text: '#c9a84c', border: 'rgba(201,168,76,0.2)' },
+  'Fair':     { bg: 'rgba(200,160,80,0.08)', text: 'rgba(200,160,80,0.8)', border: 'rgba(200,160,80,0.18)' },
+  'Poor':     { bg: 'rgba(180,80,80,0.1)',   text: 'rgba(220,100,100,0.9)', border: 'rgba(180,80,80,0.2)' },
 }
 
-const IconSearch = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.4 }}>
-    <circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/>
-  </svg>
-)
+const PAGE_SIZE = 12
 
-const IconPin = () => (
-  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
-  </svg>
-)
+function timeAgo(dateStr) {
+  const diff = Date.now() - new Date(dateStr).getTime()
+  const m = Math.floor(diff / 60000)
+  if (m < 60) return `${m}m ago`
+  const h = Math.floor(m / 60)
+  if (h < 24) return `${h}h ago`
+  const d = Math.floor(h / 24)
+  if (d < 30) return `${d}d ago`
+  return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+}
 
-const IconPhoto = () => (
-  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
-    <polyline points="21 15 16 10 5 21"/>
-  </svg>
-)
-
-const IconX = () => (
-  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-  </svg>
-)
-
-function ListingCard({ listing }) {
-  const cond = CONDITION_COLORS[listing.condition] || { bg: 'rgba(74,158,255,0.08)', text: '#4a9eff', border: 'rgba(74,158,255,0.15)' }
+function ListingCard({ listing, onSave, savedIds }) {
+  const cond = CONDITION_COLORS[listing.condition] || CONDITION_COLORS['Good']
+  const photo = listing.photo_url || (listing.photos && listing.photos[0]) || CATEGORY_PHOTOS[listing.category] || CATEGORY_PHOTOS['Other']
+  const isSaved = savedIds?.has(listing.id)
 
   return (
-    <Link href={`/listings/${listing.id}`} style={{ textDecoration: 'none', display: 'block' }}>
-    <div
-      style={{
-        background: '#0f2040',
-        border: '1px solid #162a4a',
-        borderRadius: '6px',
-        overflow: 'hidden',
-        transition: 'border-color 0.2s',
-        cursor: 'pointer',
-      }}
-      onMouseEnter={(e) => e.currentTarget.style.borderColor = '#1e3455'}
-      onMouseLeave={(e) => e.currentTarget.style.borderColor = '#162a4a'}
-    >
-      {/* Photo */}
-      <div style={{ width: '100%', height: '192px', background: '#0a1628', overflow: 'hidden', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        {listing.photo_url ? (
-          <img src={listing.photo_url} alt={listing.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-        ) : CATEGORY_PHOTOS[listing.category] ? (
-          <img
-            src={CATEGORY_PHOTOS[listing.category]}
-            alt={listing.category}
-            style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.7) saturate(0.85)' }}
-          />
-        ) : (
-          <span style={{ color: 'rgba(74,158,255,0.15)' }}><IconPhoto /></span>
-        )}
-        <div style={{
-          position: 'absolute',
-          top: '10px',
-          left: '10px',
-          background: 'rgba(10,22,40,0.85)',
-          border: '1px solid #162a4a',
-          padding: '3px 9px',
-          fontSize: '10px',
-          fontFamily: 'var(--font-dm-sans, sans-serif)',
-          fontWeight: '500',
-          letterSpacing: '0.08em',
-          textTransform: 'uppercase',
-          color: '#4a9eff',
-          backdropFilter: 'blur(4px)',
-          borderRadius: '2px',
-        }}>
-          {listing.category}
+    <div className="masonry-item listing-card" style={{ background: '#0f2040' }}>
+      <Link href={`/listings/${listing.id}`} style={{ textDecoration: 'none', display: 'block' }}>
+        <div style={{ position: 'relative', height: '200px', overflow: 'hidden', background: '#0a1628' }}>
+          <Image src={photo} alt={listing.title} fill sizes="(max-width: 768px) 50vw, 33vw" style={{ objectFit: 'cover', transition: 'transform 0.4s ease' }} />
+          <span className="category-badge" style={{ position: 'absolute', top: '10px', left: '10px' }}>{listing.category}</span>
+          {listing.condition && (
+            <span style={{ position: 'absolute', bottom: '10px', left: '10px', background: cond.bg, color: cond.text, border: `1px solid ${cond.border}`, padding: '2px 8px', borderRadius: '2px', fontSize: '10px', fontFamily: 'var(--font-dm-sans, sans-serif)', backdropFilter: 'blur(4px)' }}>
+              {listing.condition}
+            </span>
+          )}
         </div>
-      </div>
+      </Link>
 
-      {/* Content */}
-      <div style={{ padding: '18px 20px 20px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '10px', marginBottom: '10px' }}>
-          <h3 style={{
-            fontFamily: 'var(--font-dm-sans, sans-serif)',
-            fontSize: '14px',
-            fontWeight: '500',
-            margin: 0,
-            color: '#f8f9fa',
-            lineHeight: 1.4,
-            flex: 1,
-          }}>
-            {listing.title}
-          </h3>
-          <span style={{
-            fontFamily: 'var(--font-playfair, serif)',
-            fontSize: '1rem',
-            color: '#c9a84c',
-            fontWeight: '500',
-            whiteSpace: 'nowrap',
-          }}>
+      <div style={{ padding: '14px 16px 16px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px', marginBottom: '8px' }}>
+          <Link href={`/listings/${listing.id}`} style={{ textDecoration: 'none', flex: 1 }}>
+            <h3 style={{ fontFamily: 'var(--font-dm-sans, sans-serif)', fontSize: '13px', fontWeight: '500', color: '#f8f9fa', margin: 0, lineHeight: 1.4 }} className="truncate-2">
+              {listing.title}
+            </h3>
+          </Link>
+          <button
+            onClick={() => onSave(listing.id)}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: isSaved ? '#c9a84c' : 'rgba(143,163,184,0.3)', padding: '2px', transition: 'color 0.15s', flexShrink: 0 }}
+            title={isSaved ? 'Unsave' : 'Save'}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill={isSaved ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+            </svg>
+          </button>
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontFamily: 'var(--font-playfair, serif)', fontSize: '16px', color: '#c9a84c', fontWeight: '500' }}>
             ${Number(listing.price).toLocaleString()}
           </span>
+          <span style={{ fontFamily: 'var(--font-dm-sans, sans-serif)', fontSize: '11px', color: 'rgba(143,163,184,0.3)' }}>
+            {timeAgo(listing.created_at)}
+          </span>
         </div>
 
-        {listing.condition && (
-          <span style={{
-            display: 'inline-block',
-            background: cond.bg,
-            color: cond.text,
-            border: `1px solid ${cond.border}`,
-            padding: '2px 9px',
-            borderRadius: '2px',
-            fontSize: '11px',
-            fontFamily: 'var(--font-dm-sans, sans-serif)',
-            fontWeight: '400',
-            marginBottom: '10px',
-          }}>
-            {listing.condition}
-          </span>
+        {listing.location && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '6px' }}>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(143,163,184,0.3)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span style={{ fontFamily: 'var(--font-dm-sans, sans-serif)', fontSize: '11px', color: 'rgba(143,163,184,0.3)' }}>{listing.location}</span>
+          </div>
         )}
 
-        {listing.description && (
-          <p style={{
-            color: '#8fa3b8',
-            fontSize: '13px',
-            lineHeight: '1.55',
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-            fontFamily: 'var(--font-dm-sans, sans-serif)',
-            fontWeight: '300',
-            margin: '0 0 12px',
-          }}>
-            {listing.description}
+        {listing.seller_username && (
+          <p style={{ fontFamily: 'var(--font-dm-sans, sans-serif)', fontSize: '11px', color: 'rgba(143,163,184,0.25)', margin: '6px 0 0' }}>
+            by {listing.seller_username}
           </p>
         )}
-
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px' }}>
-          {listing.location ? (
-            <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'rgba(143,163,184,0.45)', fontSize: '11px', fontFamily: 'var(--font-dm-sans, sans-serif)' }}>
-              <IconPin /> {listing.location}
-            </span>
-          ) : <span />}
-          <span style={{ color: 'rgba(143,163,184,0.3)', fontSize: '11px', fontFamily: 'var(--font-dm-sans, sans-serif)' }}>
-            {new Date(listing.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-          </span>
-        </div>
       </div>
     </div>
-    </Link>
   )
 }
 
-export default function BrowsePage() {
+function BrowsePageInner() {
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const { user } = useAuth()
+  const { addToast } = useToast()
+
   const [listings, setListings] = useState([])
-  const [filtered, setFiltered] = useState([])
-  const [search, setSearch] = useState('')
-  const [category, setCategory] = useState('All')
-  const [conditions, setConditions] = useState([])
-  const [priceMin, setPriceMin] = useState('')
-  const [priceMax, setPriceMax] = useState('')
-  const [location, setLocation] = useState('')
   const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [hasMore, setHasMore] = useState(true)
+  const [total, setTotal] = useState(0)
+  const [savedIds, setSavedIds] = useState(new Set())
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
 
-  const [fetchError, setFetchError] = useState(null)
+  // Filters
+  const [search, setSearch]       = useState(searchParams.get('q') || '')
+  const [category, setCategory]   = useState(searchParams.get('category') || 'All')
+  const [conditions, setConditions] = useState([])
+  const [priceMin, setPriceMin]   = useState('')
+  const [priceMax, setPriceMax]   = useState('')
+  const [location, setLocation]   = useState('')
+  const [sort, setSort]           = useState('newest')
+  const [page, setPage]           = useState(0)
+  const observerTarget = useRef(null)
 
+  // Update URL params
+  const updateURL = useCallback((params) => {
+    const url = new URLSearchParams()
+    if (params.q)        url.set('q', params.q)
+    if (params.category && params.category !== 'All') url.set('category', params.category)
+    if (params.sort && params.sort !== 'newest') url.set('sort', params.sort)
+    router.replace(`/browse?${url.toString()}`, { scroll: false })
+  }, [router])
+
+  // Fetch listings
+  const fetchListings = useCallback(async (pageNum = 0, replace = true) => {
+    if (pageNum === 0) setLoading(true)
+    else setLoadingMore(true)
+
+    try {
+      const supabase = createClient()
+      let query = supabase
+        .from('listings')
+        .select('id,title,price,condition,category,location,photo_url,photos,views,saves,created_at,user_id,seller_email', { count: 'exact' })
+        .eq('status', 'active')
+
+      if (category !== 'All') query = query.eq('category', category)
+      if (conditions.length > 0) query = query.in('condition', conditions)
+      if (priceMin) query = query.gte('price', Number(priceMin))
+      if (priceMax) query = query.lte('price', Number(priceMax))
+      if (location.trim()) query = query.ilike('location', `%${location}%`)
+      if (search.trim()) query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%`)
+
+      switch (sort) {
+        case 'price_asc':  query = query.order('price', { ascending: true }); break
+        case 'price_desc': query = query.order('price', { ascending: false }); break
+        case 'views':      query = query.order('views', { ascending: false }); break
+        case 'saves':      query = query.order('saves', { ascending: false }); break
+        default:           query = query.order('created_at', { ascending: false })
+      }
+
+      query = query.range(pageNum * PAGE_SIZE, (pageNum + 1) * PAGE_SIZE - 1)
+      const { data, count, error } = await query
+      if (error) throw error
+
+      // Fetch usernames for sellers
+      const userIds = [...new Set((data || []).map(l => l.user_id))]
+      let profileMap = {}
+      if (userIds.length > 0) {
+        const { data: profiles } = await supabase.from('profiles').select('id,username').in('id', userIds)
+        if (profiles) profiles.forEach(p => { profileMap[p.id] = p.username })
+      }
+
+      const enriched = (data || []).map(l => ({ ...l, seller_username: profileMap[l.user_id] || null }))
+      setTotal(count || 0)
+      setHasMore((data || []).length === PAGE_SIZE)
+      if (replace) setListings(enriched)
+      else setListings(prev => [...prev, ...enriched])
+    } catch (err) {
+      addToast('Failed to load listings', 'error')
+    } finally {
+      setLoading(false)
+      setLoadingMore(false)
+    }
+  }, [category, conditions, priceMin, priceMax, location, search, sort, addToast])
+
+  // Fetch saved listings for current user
   useEffect(() => {
+    if (!user) { setSavedIds(new Set()); return }
     const supabase = createClient()
-    supabase
-      .from('listings')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .then(({ data, error }) => {
-        if (error) {
-          console.error('Supabase listings error:', error)
-          setFetchError(error.message)
-        } else {
-          setListings(data || [])
-        }
-        setLoading(false)
+    supabase.from('saved_listings').select('listing_id').eq('user_id', user.id)
+      .then(({ data }) => {
+        if (data) setSavedIds(new Set(data.map(r => r.listing_id)))
       })
-  }, [])
+  }, [user])
 
+  // Initial load + filter changes
+  useEffect(() => {
+    setPage(0)
+    fetchListings(0, true)
+    updateURL({ q: search, category, sort })
+  }, [category, conditions, priceMin, priceMax, location, search, sort])
+
+  // Infinite scroll
+  useEffect(() => {
+    if (!observerTarget.current) return
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !loadingMore && !loading) {
+          const next = page + 1
+          setPage(next)
+          fetchListings(next, false)
+        }
+      },
+      { threshold: 0.1 }
+    )
+    observer.observe(observerTarget.current)
+    return () => observer.disconnect()
+  }, [hasMore, loadingMore, loading, page, fetchListings])
+
+  const handleSave = async (listingId) => {
+    if (!user) { addToast('Sign in to save listings', 'info'); router.push('/auth/login'); return }
+    const supabase = createClient()
+    if (savedIds.has(listingId)) {
+      await supabase.from('saved_listings').delete().eq('user_id', user.id).eq('listing_id', listingId)
+      setSavedIds(prev => { const next = new Set(prev); next.delete(listingId); return next })
+      addToast('Listing removed from saves', 'info')
+    } else {
+      await supabase.from('saved_listings').insert({ user_id: user.id, listing_id: listingId })
+      setSavedIds(prev => new Set([...prev, listingId]))
+      addToast('Listing saved!', 'success')
+    }
+  }
+
+  const clearAll = () => { setSearch(''); setCategory('All'); setConditions([]); setPriceMin(''); setPriceMax(''); setLocation(''); setSort('newest') }
   const hasFilters = search || category !== 'All' || conditions.length > 0 || priceMin || priceMax || location
 
-  const clearAll = () => {
-    setSearch('')
-    setCategory('All')
-    setConditions([])
-    setPriceMin('')
-    setPriceMax('')
-    setLocation('')
-  }
+  const FilterPanel = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+      <div>
+        <p className="fm-label" style={{ marginBottom: '12px' }}>Category</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          {CATEGORIES.map(cat => (
+            <button key={cat} onClick={() => setCategory(cat)} style={{ background: category === cat ? 'rgba(201,168,76,0.1)' : 'none', color: category === cat ? '#c9a84c' : 'rgba(143,163,184,0.55)', border: `1px solid ${category === cat ? 'rgba(201,168,76,0.25)' : 'transparent'}`, padding: '8px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '13px', fontFamily: 'var(--font-dm-sans, sans-serif)', textAlign: 'left', transition: 'all 0.15s', fontWeight: category === cat ? '500' : '400' }}>
+              {cat}
+            </button>
+          ))}
+        </div>
+      </div>
 
-  const toggleCondition = (cond) => {
-    setConditions((prev) =>
-      prev.includes(cond) ? prev.filter((c) => c !== cond) : [...prev, cond]
-    )
-  }
+      <div>
+        <p className="fm-label" style={{ marginBottom: '12px' }}>Condition</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          {CONDITIONS.map(cond => {
+            const active = conditions.includes(cond)
+            const c = CONDITION_COLORS[cond]
+            return (
+              <button key={cond} onClick={() => setConditions(prev => active ? prev.filter(x => x !== cond) : [...prev, cond])} style={{ background: active ? c.bg : 'none', color: active ? c.text : 'rgba(143,163,184,0.55)', border: `1px solid ${active ? c.border : 'transparent'}`, padding: '8px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '13px', fontFamily: 'var(--font-dm-sans, sans-serif)', textAlign: 'left', transition: 'all 0.15s' }}>
+                {cond}
+              </button>
+            )
+          })}
+        </div>
+      </div>
 
-  useEffect(() => {
-    let result = listings
-    if (category !== 'All') result = result.filter((l) => l.category === category)
-    if (conditions.length > 0) result = result.filter((l) => conditions.includes(l.condition))
-    if (priceMin) result = result.filter((l) => Number(l.price) >= Number(priceMin))
-    if (priceMax) result = result.filter((l) => Number(l.price) <= Number(priceMax))
-    if (location.trim()) result = result.filter((l) => l.location?.toLowerCase().includes(location.toLowerCase()))
-    if (search.trim()) {
-      const s = search.toLowerCase()
-      result = result.filter(
-        (l) =>
-          l.title?.toLowerCase().includes(s) ||
-          l.description?.toLowerCase().includes(s) ||
-          l.location?.toLowerCase().includes(s)
-      )
-    }
-    setFiltered(result)
-  }, [listings, search, category, conditions, priceMin, priceMax, location])
+      <div>
+        <p className="fm-label" style={{ marginBottom: '12px' }}>Price Range</p>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <div style={{ position: 'relative', flex: 1 }}>
+            <span style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', fontSize: '13px', color: 'rgba(143,163,184,0.4)', fontFamily: 'var(--font-dm-sans, sans-serif)' }}>$</span>
+            <input type="number" value={priceMin} onChange={e => setPriceMin(e.target.value)} placeholder="Min" className="fm-input" style={{ paddingLeft: '22px', padding: '9px 10px 9px 22px' }} min="0" />
+          </div>
+          <span style={{ color: 'rgba(143,163,184,0.3)', fontSize: '12px' }}>—</span>
+          <div style={{ position: 'relative', flex: 1 }}>
+            <span style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', fontSize: '13px', color: 'rgba(143,163,184,0.4)', fontFamily: 'var(--font-dm-sans, sans-serif)' }}>$</span>
+            <input type="number" value={priceMax} onChange={e => setPriceMax(e.target.value)} placeholder="Max" className="fm-input" style={{ paddingLeft: '22px', padding: '9px 10px 9px 22px' }} min="0" />
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <p className="fm-label" style={{ marginBottom: '12px' }}>Location</p>
+        <input type="text" value={location} onChange={e => setLocation(e.target.value)} placeholder="City, state..." className="fm-input" />
+      </div>
+
+      {hasFilters && (
+        <button onClick={clearAll} style={{ background: 'none', border: '1px solid rgba(220,80,80,0.2)', borderRadius: '4px', padding: '10px', cursor: 'pointer', color: 'rgba(220,100,100,0.6)', fontFamily: 'var(--font-dm-sans, sans-serif)', fontSize: '12px', letterSpacing: '0.04em', transition: 'all 0.15s' }}>
+          Clear all filters
+        </button>
+      )}
+    </div>
+  )
 
   return (
     <main style={{ background: '#0a1628', minHeight: '100vh', color: '#8fa3b8', paddingTop: '60px' }}>
       <Navbar />
 
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '48px 32px' }}>
-        {/* Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '40px', flexWrap: 'wrap', gap: '16px' }}>
+      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '40px 32px' }}>
+
+        {/* Header row */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px', flexWrap: 'wrap', gap: '16px' }}>
           <div>
-            <h1 style={{
-              fontFamily: 'var(--font-playfair, serif)',
-              fontSize: '2.2rem',
-              fontWeight: '500',
-              color: '#f8f9fa',
-              marginBottom: '6px',
-            }}>
-              Browse Gear
-            </h1>
-            <p style={{ fontFamily: 'var(--font-dm-sans, sans-serif)', color: 'rgba(143,163,184,0.55)', margin: 0, fontSize: '14px', fontWeight: '300' }}>
-              {loading ? 'Loading...' : `${filtered.length} listing${filtered.length !== 1 ? 's' : ''} available`}
+            <h1 style={{ fontFamily: 'var(--font-playfair, serif)', fontSize: '2.2rem', fontWeight: '500', color: '#f8f9fa', marginBottom: '4px' }}>Browse Gear</h1>
+            <p style={{ fontFamily: 'var(--font-dm-sans, sans-serif)', color: 'rgba(143,163,184,0.4)', margin: 0, fontSize: '13px', fontWeight: '300' }}>
+              {loading ? 'Loading...' : `${total.toLocaleString()} listing${total !== 1 ? 's' : ''} found`}
             </p>
           </div>
-          <Link href="/listings/new" className="btn-primary">
-            Sell Your Gear
-          </Link>
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
+            {/* Sort */}
+            <select value={sort} onChange={e => setSort(e.target.value)} className="fm-input" style={{ width: 'auto', padding: '9px 14px', fontSize: '13px' }}>
+              {SORTS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+            </select>
+            {/* Mobile filter toggle */}
+            <button onClick={() => setMobileFiltersOpen(true)} className="btn-secondary" style={{ display: 'none' }} id="mobile-filter-btn">
+              Filters
+            </button>
+            <Link href="/listings/new" className="btn-primary" style={{ padding: '10px 20px', fontSize: '13px' }}>Sell Gear</Link>
+          </div>
         </div>
 
-        {/* Search */}
-        <div style={{ position: 'relative', marginBottom: '20px' }}>
-          <span style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', display: 'flex', color: '#8fa3b8' }}>
-            <IconSearch />
+        {/* Search bar */}
+        <div style={{ position: 'relative', marginBottom: '24px' }}>
+          <span style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(143,163,184,0.4)' }}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/></svg>
           </span>
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by title, description, or location..."
-            className="fm-input"
-            style={{ paddingLeft: '44px' }}
-          />
+          <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search listings..." className="fm-input" style={{ paddingLeft: '44px', fontSize: '15px' }} />
         </div>
 
-        {/* Filters */}
-        <div style={{ marginBottom: '40px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-
-          {/* Category pills */}
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-            {CATEGORIES.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setCategory(cat)}
-                style={{
-                  background: category === cat ? '#c9a84c' : 'transparent',
-                  color: category === cat ? '#0a1628' : 'rgba(143,163,184,0.55)',
-                  border: `1px solid ${category === cat ? '#c9a84c' : '#162a4a'}`,
-                  padding: '6px 16px',
-                  borderRadius: '2px',
-                  cursor: 'pointer',
-                  fontSize: '12px',
-                  fontFamily: 'var(--font-dm-sans, sans-serif)',
-                  fontWeight: category === cat ? '600' : '400',
-                  letterSpacing: '0.04em',
-                  transition: 'all 0.15s',
-                }}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-
-          {/* Condition + Price + Location row */}
-          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'flex-end' }}>
-
-            {/* Condition pills */}
-            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-              {CONDITIONS.map((cond) => {
-                const active = conditions.includes(cond)
-                return (
-                  <button
-                    key={cond}
-                    onClick={() => toggleCondition(cond)}
-                    style={{
-                      background: active ? 'rgba(74,158,255,0.12)' : 'transparent',
-                      color: active ? '#4a9eff' : 'rgba(143,163,184,0.45)',
-                      border: `1px solid ${active ? 'rgba(74,158,255,0.3)' : '#162a4a'}`,
-                      padding: '5px 13px',
-                      borderRadius: '2px',
-                      cursor: 'pointer',
-                      fontSize: '11px',
-                      fontFamily: 'var(--font-dm-sans, sans-serif)',
-                      letterSpacing: '0.04em',
-                      transition: 'all 0.15s',
-                    }}
-                  >
-                    {cond}
-                  </button>
-                )
-              })}
-            </div>
-
-            {/* Price range */}
-            <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-              <div style={{ position: 'relative' }}>
-                <span style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(143,163,184,0.4)', fontFamily: 'var(--font-dm-sans, sans-serif)', fontSize: '13px' }}>$</span>
-                <input
-                  type="number"
-                  value={priceMin}
-                  onChange={(e) => setPriceMin(e.target.value)}
-                  placeholder="Min"
-                  className="fm-input"
-                  style={{ width: '90px', paddingLeft: '22px', padding: '8px 10px 8px 22px' }}
-                  min="0"
-                />
-              </div>
-              <span style={{ color: 'rgba(143,163,184,0.3)', fontSize: '12px', fontFamily: 'var(--font-dm-sans, sans-serif)' }}>—</span>
-              <div style={{ position: 'relative' }}>
-                <span style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(143,163,184,0.4)', fontFamily: 'var(--font-dm-sans, sans-serif)', fontSize: '13px' }}>$</span>
-                <input
-                  type="number"
-                  value={priceMax}
-                  onChange={(e) => setPriceMax(e.target.value)}
-                  placeholder="Max"
-                  className="fm-input"
-                  style={{ width: '90px', padding: '8px 10px 8px 22px' }}
-                  min="0"
-                />
-              </div>
-            </div>
-
-            {/* Location filter */}
-            <input
-              type="text"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              placeholder="Location..."
-              className="fm-input"
-              style={{ width: '160px', padding: '8px 14px' }}
-            />
-
-            {/* Clear all */}
-            {hasFilters && (
-              <button
-                onClick={clearAll}
-                style={{
-                  background: 'none',
-                  border: '1px solid #162a4a',
-                  borderRadius: '2px',
-                  padding: '5px 13px',
-                  cursor: 'pointer',
-                  color: 'rgba(143,163,184,0.4)',
-                  fontFamily: 'var(--font-dm-sans, sans-serif)',
-                  fontSize: '11px',
-                  letterSpacing: '0.04em',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '5px',
-                  transition: 'color 0.15s',
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.color = '#f8f9fa'}
-                onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(143,163,184,0.4)'}
-              >
-                <IconX /> Clear all
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Results */}
-        {fetchError ? (
-          <div style={{ textAlign: 'center', padding: '80px 24px' }}>
-            <p style={{ fontFamily: 'var(--font-playfair, serif)', fontSize: '1.2rem', color: 'rgba(220,100,100,0.7)', marginBottom: '12px' }}>
-              Could not load listings
-            </p>
-            <p style={{ fontFamily: 'var(--font-dm-sans, sans-serif)', fontSize: '12px', color: 'rgba(143,163,184,0.4)', fontWeight: '300', fontFamily: 'monospace', background: 'rgba(180,80,80,0.06)', border: '1px solid rgba(180,80,80,0.15)', borderRadius: '4px', padding: '12px 16px', display: 'inline-block' }}>
-              {fetchError}
-            </p>
-          </div>
-        ) : loading ? (
-          <div style={{ textAlign: 'center', padding: '100px 24px', color: 'rgba(143,163,184,0.3)', fontFamily: 'var(--font-dm-sans, sans-serif)', fontSize: '14px', fontWeight: '300' }}>
-            Loading listings...
-          </div>
-        ) : filtered.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '100px 24px' }}>
-            <p style={{ fontFamily: 'var(--font-playfair, serif)', fontSize: '1.4rem', color: 'rgba(143,163,184,0.3)', marginBottom: '12px' }}>
-              No listings found
-            </p>
-            <p style={{ fontFamily: 'var(--font-dm-sans, sans-serif)', color: 'rgba(143,163,184,0.3)', fontSize: '13px', fontWeight: '300', marginBottom: '28px' }}>
-              {search || category !== 'All' ? 'Try adjusting your search or filters' : 'Be the first to list your gear'}
-            </p>
-            {!search && category === 'All' && (
-              <Link href="/listings/new" className="btn-primary">List Your Gear</Link>
-            )}
-          </div>
-        ) : (
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
-            gap: '20px',
-          }}>
-            {filtered.map((listing) => (
-              <ListingCard key={listing.id} listing={listing} />
-            ))}
+        {/* Active filter pills */}
+        {hasFilters && (
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '24px' }}>
+            {search && <FilterPill label={`"${search}"`} onRemove={() => setSearch('')} />}
+            {category !== 'All' && <FilterPill label={category} onRemove={() => setCategory('All')} />}
+            {conditions.map(c => <FilterPill key={c} label={c} onRemove={() => setConditions(prev => prev.filter(x => x !== c))} />)}
+            {priceMin && <FilterPill label={`Min $${priceMin}`} onRemove={() => setPriceMin('')} />}
+            {priceMax && <FilterPill label={`Max $${priceMax}`} onRemove={() => setPriceMax('')} />}
+            {location && <FilterPill label={location} onRemove={() => setLocation('')} />}
           </div>
         )}
+
+        {/* Main layout: sidebar + grid */}
+        <div style={{ display: 'grid', gridTemplateColumns: '220px 1fr', gap: '40px', alignItems: 'start' }}>
+          {/* Sidebar filters (desktop) */}
+          <div style={{ position: 'sticky', top: '80px' }}>
+            <FilterPanel />
+          </div>
+
+          {/* Listings grid */}
+          <div>
+            {loading ? (
+              <div className="masonry-grid">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="masonry-item">
+                    <div className="skeleton" style={{ height: '200px', borderRadius: '6px', marginBottom: '8px' }} />
+                    <div className="skeleton" style={{ height: '16px', width: '80%', borderRadius: '4px', marginBottom: '8px' }} />
+                    <div className="skeleton" style={{ height: '14px', width: '40%', borderRadius: '4px' }} />
+                  </div>
+                ))}
+              </div>
+            ) : listings.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '80px 24px' }}>
+                <p style={{ fontFamily: 'var(--font-playfair, serif)', fontSize: '1.4rem', color: 'rgba(143,163,184,0.2)', marginBottom: '12px' }}>No listings found</p>
+                <p style={{ fontFamily: 'var(--font-dm-sans, sans-serif)', fontSize: '13px', color: 'rgba(143,163,184,0.3)', fontWeight: '300', marginBottom: '24px' }}>
+                  {hasFilters ? 'Try adjusting your filters' : 'Be the first to list gear'}
+                </p>
+                {hasFilters ? (
+                  <button onClick={clearAll} className="btn-ghost">Clear Filters</button>
+                ) : (
+                  <Link href="/listings/new" className="btn-primary">List Your Gear</Link>
+                )}
+              </div>
+            ) : (
+              <>
+                <div className="masonry-grid">
+                  {listings.map(l => (
+                    <ListingCard key={l.id} listing={l} onSave={handleSave} savedIds={savedIds} />
+                  ))}
+                </div>
+                {/* Infinite scroll trigger */}
+                <div ref={observerTarget} style={{ height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {loadingMore && <span style={{ fontFamily: 'var(--font-dm-sans, sans-serif)', fontSize: '12px', color: 'rgba(143,163,184,0.3)' }}>Loading more...</span>}
+                  {!hasMore && listings.length > 0 && <span style={{ fontFamily: 'var(--font-dm-sans, sans-serif)', fontSize: '12px', color: 'rgba(143,163,184,0.2)' }}>All listings loaded</span>}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
       </div>
     </main>
+  )
+}
+
+export default function BrowsePage() {
+  return (
+    <Suspense fallback={<div style={{ background: '#0a1628', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-dm-sans, sans-serif)', color: 'rgba(143,163,184,0.3)' }}>Loading...</div>}>
+      <BrowsePageInner />
+    </Suspense>
+  )
+}
+
+function FilterPill({ label, onRemove }) {
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(201,168,76,0.08)', border: '1px solid rgba(201,168,76,0.2)', color: '#c9a84c', padding: '4px 10px', borderRadius: '2px', fontSize: '12px', fontFamily: 'var(--font-dm-sans, sans-serif)' }}>
+      {label}
+      <button onClick={onRemove} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(201,168,76,0.5)', padding: 0, display: 'flex', alignItems: 'center', lineHeight: 1 }}>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </span>
   )
 }

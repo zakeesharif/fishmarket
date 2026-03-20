@@ -1,34 +1,23 @@
 import Navbar from '@/components/Navbar'
 import ActivityTicker from '@/components/ActivityTicker'
 import LatestCatches from '@/components/LatestCatches'
+import HomepageDynamic from '@/components/HomepageDynamic'
 import Link from 'next/link'
+import Image from 'next/image'
 
-const BENTO = [
-  {
-    label: 'Tackle Marketplace',
-    stat: '2,400+',
-    desc: 'Rods, reels, lures, line and tackle boxes from verified sellers.',
-    href: '/browse',
-  },
-  {
-    label: 'Boats & Marine',
-    stat: '340+',
-    desc: 'Vessels, outboards and marine equipment listed nationwide.',
-    href: '/browse?category=Boats',
-  },
-  {
-    label: 'Charters & Trips',
-    stat: '500+',
-    desc: 'Licensed captains and guides across fresh and saltwater.',
-    href: '/browse',
-  },
-  {
-    label: 'Learn to Fish',
-    stat: 'Free',
-    desc: 'Expert instruction from your first cast to offshore bluewater.',
-    href: '/browse',
-  },
+const UNSPLASH = (id, w = 600) => `https://images.unsplash.com/${id}?w=${w}&auto=format&fit=crop`
+
+const CATEGORIES = [
+  { label: 'Rods & Reels',  href: '/browse?category=Rods',   photo: UNSPLASH('photo-1544551763-46a013bb70d5'), count: '2,400+', desc: 'From surf sticks to ultralight finesse rods' },
+  { label: 'Boats & Marine', href: '/browse?category=Boats', photo: UNSPLASH('photo-1567899378494-47b22a2ae96a'), count: '340+', desc: 'Center consoles, skiffs, and outboards' },
+  { label: 'Charters',       href: '/charters',              photo: UNSPLASH('photo-1559827260-dc66d52bef19'), count: '500+', desc: 'Licensed captains across fresh and saltwater' },
+  { label: 'Lures & Tackle', href: '/browse?category=Lures', photo: UNSPLASH('photo-1578662996442-48f60103fc96'), count: '8,000+', desc: 'Plugs, jigs, flies, and terminal tackle' },
 ]
+
+export const metadata = {
+  title: 'Seaitall — The World\'s Fishing Marketplace',
+  description: 'Buy and sell fishing gear, find charters, book guides, and log your catches. Seaitall is the world\'s fishing marketplace.',
+}
 
 export default function Home() {
   return (
@@ -36,224 +25,132 @@ export default function Home() {
       <Navbar />
       <ActivityTicker />
 
-      {/* ── Hero ───────────────────────────────── */}
+      {/* ── HERO ────────────────────────────────────── */}
       <section style={{
-        minHeight: '100svh',
-        position: 'relative',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        textAlign: 'center',
-        padding: '120px 24px 80px',
+        minHeight: '100svh', position: 'relative',
+        display: 'flex', flexDirection: 'column',
+        justifyContent: 'center', alignItems: 'center',
+        textAlign: 'center', padding: '120px 24px 100px',
         overflow: 'hidden',
       }}>
-        {/* Background photo — fishing at golden hour */}
-        <div style={{
-          position: 'absolute',
-          inset: 0,
-          backgroundImage: 'url(https://source.unsplash.com/featured/?fishing,ocean,saltwater)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center 40%',
-        }} />
+        <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+          <Image
+            src={UNSPLASH('photo-1544551763-46a013bb70d5', 1920)}
+            alt="Fishing at golden hour" fill priority sizes="100vw"
+            style={{ objectFit: 'cover', objectPosition: 'center 40%' }}
+          />
+        </div>
+        <div style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'rgba(10,22,40,0.55)' }} />
+        <div style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'linear-gradient(to bottom, rgba(10,22,40,0.2) 0%, rgba(10,22,40,0.5) 60%, rgba(10,22,40,1) 100%)' }} />
+        <div style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'radial-gradient(ellipse at center, transparent 40%, rgba(10,22,40,0.4) 100%)' }} />
 
-        {/* Dark cinematic overlay */}
-        <div style={{
-          position: 'absolute',
-          inset: 0,
-          background: 'linear-gradient(to bottom, rgba(10,22,40,0.45) 0%, rgba(10,22,40,0.55) 50%, rgba(10,22,40,0.95) 90%, #0a1628 100%)',
-        }} />
-
-        {/* Grain texture overlay for film-like feel */}
-        <div style={{
-          position: 'absolute',
-          inset: 0,
-          backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noise)\' opacity=\'0.04\'/%3E%3C/svg%3E")',
-          opacity: 0.5,
-          pointerEvents: 'none',
-        }} />
-
-        {/* Content */}
-        <div style={{ position: 'relative', zIndex: 1 }}>
-          {/* Eyebrow */}
-          <p style={{
-            fontFamily: 'var(--font-dm-sans, sans-serif)',
-            fontSize: '11px',
-            fontWeight: '500',
-            letterSpacing: '0.2em',
-            textTransform: 'uppercase',
-            color: 'rgba(201,168,76,0.7)',
-            marginBottom: '24px',
-          }}>
+        <div style={{ position: 'relative', zIndex: 2, maxWidth: '860px', width: '100%' }}>
+          <p className="animate-fade-up-1" style={{ fontFamily: 'var(--font-dm-sans, sans-serif)', fontSize: '11px', fontWeight: '500', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(201,168,76,0.8)', marginBottom: '28px' }}>
             The World's Fishing Marketplace
           </p>
 
-          <h1
-            className="hero-headline"
-            style={{
-              fontFamily: 'var(--font-playfair, serif)',
-              fontSize: '5.5rem',
-              fontWeight: '500',
-              lineHeight: 1.08,
-              color: '#f8f9fa',
-              maxWidth: '820px',
-              marginBottom: '28px',
-              letterSpacing: '-0.02em',
-              textShadow: '0 2px 40px rgba(0,0,0,0.5)',
-            }}
-          >
-            Sea it all.<br />
-            Buy it all.<br />
-            <em style={{ fontStyle: 'italic', color: 'rgba(248,249,250,0.45)' }}>Fish it all.</em>
+          <h1 className="hero-headline" style={{ fontFamily: 'var(--font-playfair, serif)', fontWeight: '500', fontSize: '5.8rem', lineHeight: 1.06, color: '#f8f9fa', marginBottom: 0, letterSpacing: '-0.02em', textShadow: '0 2px 40px rgba(0,0,0,0.4)' }}>
+            <span className="animate-fade-up-1" style={{ display: 'block' }}>Sea it all.</span>
+            <span className="animate-fade-up-2" style={{ display: 'block' }}>Buy it all.</span>
+            <span className="animate-fade-up-3" style={{ display: 'block', color: 'rgba(248,249,250,0.38)', fontStyle: 'italic' }}>Fish it all.</span>
           </h1>
 
-          <p style={{
-            fontFamily: 'var(--font-dm-sans, sans-serif)',
-            fontSize: '1.05rem',
-            fontWeight: '300',
-            color: 'rgba(248,249,250,0.55)',
-            maxWidth: '380px',
-            lineHeight: 1.7,
-            marginBottom: '52px',
-            letterSpacing: '0.01em',
-            margin: '0 auto 52px',
-          }}>
-            Gear, boats, charters, and knowledge —<br />all in one place.
+          <p className="animate-fade-up-3" style={{ fontFamily: 'var(--font-dm-sans, sans-serif)', fontSize: '1.05rem', fontWeight: '300', color: 'rgba(248,249,250,0.5)', lineHeight: 1.7, marginBottom: '52px', marginTop: '28px', letterSpacing: '0.01em' }}>
+            Gear, boats, charters, and knowledge — all in one place.
           </p>
 
-          <div className="hero-ctas" style={{ display: 'flex', gap: '14px', alignItems: 'center', justifyContent: 'center' }}>
-            <Link href="/browse" className="btn-primary">
-              Browse Gear
-            </Link>
-            <Link href="/listings/new" className="btn-ghost">
-              List Your Gear
-            </Link>
+          <div className="hero-ctas animate-fade-up-4" style={{ display: 'flex', gap: '14px', alignItems: 'center', justifyContent: 'center' }}>
+            <Link href="/browse" className="btn-primary" style={{ padding: '15px 32px', fontSize: '15px' }}>Browse Gear</Link>
+            <Link href="/listings/new" className="btn-ghost" style={{ padding: '14px 32px', fontSize: '15px' }}>List Your Gear</Link>
           </div>
 
-          {/* Scroll hint */}
-          <div style={{ marginTop: '72px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', opacity: 0.3 }}>
-            <div style={{ width: '1px', height: '40px', background: 'linear-gradient(to bottom, transparent, rgba(248,249,250,0.6))' }} />
+          <div className="animate-fade-up-4" style={{ marginTop: '80px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', opacity: 0.2 }}>
+            <span style={{ fontFamily: 'var(--font-dm-sans, sans-serif)', fontSize: '10px', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#f8f9fa' }}>scroll</span>
+            <div style={{ width: '1px', height: '36px', background: 'linear-gradient(to bottom, transparent, rgba(248,249,250,0.7))' }} />
           </div>
         </div>
       </section>
 
-      {/* ── Social Proof Bar ───────────────────── */}
-      <div style={{
-        borderTop: '1px solid #162a4a',
-        borderBottom: '1px solid #162a4a',
-        padding: '18px 24px',
-        textAlign: 'center',
-        fontFamily: 'var(--font-dm-sans, sans-serif)',
-        fontSize: '13px',
-        color: 'rgba(143,163,184,0.5)',
-        letterSpacing: '0.04em',
-      }}>
-        Join{' '}
-        <span style={{ color: '#c9a84c', fontWeight: '500' }}>2,400</span>
-        {' '}fishermen already on Seaitall
-      </div>
+      {/* Dynamic: stats, listings, charters */}
+      <HomepageDynamic />
 
-      {/* ── Bento Grid ─────────────────────────── */}
+      {/* ── CATEGORIES ──────────────────────────────── */}
       <section style={{ padding: '80px 48px' }}>
-        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-          <h2 style={{
-            fontFamily: 'var(--font-playfair, serif)',
-            fontSize: '2rem',
-            fontWeight: '400',
-            color: '#f8f9fa',
-            marginBottom: '40px',
-            letterSpacing: '-0.01em',
-          }}>
-            Everything you need
-          </h2>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '40px', flexWrap: 'wrap', gap: '16px' }}>
+            <h2 style={{ fontFamily: 'var(--font-playfair, serif)', fontSize: '2rem', fontWeight: '400', color: '#f8f9fa', letterSpacing: '-0.01em' }}>Everything you need</h2>
+            <Link href="/browse" className="bento-explore-link">Browse all <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></Link>
+          </div>
 
-          <div className="bento-grid">
-            {BENTO.map((item) => (
-              <div key={item.label} className="bento-cell">
-                <p style={{
-                  fontFamily: 'var(--font-dm-sans, sans-serif)',
-                  fontSize: '11px',
-                  fontWeight: '500',
-                  letterSpacing: '0.12em',
-                  textTransform: 'uppercase',
-                  color: 'rgba(143,163,184,0.5)',
-                  margin: '0 0 20px',
-                }}>
-                  {item.label}
-                </p>
-
-                <p style={{
-                  fontFamily: 'var(--font-playfair, serif)',
-                  fontSize: '3.2rem',
-                  fontWeight: '500',
-                  color: '#c9a84c',
-                  lineHeight: 1,
-                  margin: '0 0 16px',
-                  letterSpacing: '-0.01em',
-                }}>
-                  {item.stat}
-                </p>
-
-                <p style={{
-                  fontFamily: 'var(--font-dm-sans, sans-serif)',
-                  fontSize: '14px',
-                  fontWeight: '300',
-                  color: '#8fa3b8',
-                  lineHeight: 1.6,
-                  margin: '0 0 28px',
-                  maxWidth: '320px',
-                }}>
-                  {item.desc}
-                </p>
-
-                <Link href={item.href} className="bento-explore-link">
-                  Explore
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="5" y1="12" x2="19" y2="12"/>
-                    <polyline points="12 5 19 12 12 19"/>
-                  </svg>
-                </Link>
-              </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '2px' }}>
+            {CATEGORIES.map((cat) => (
+              <Link key={cat.label} href={cat.href} style={{ textDecoration: 'none', display: 'block' }} className="cat-card">
+                <div style={{ position: 'relative', height: '320px', overflow: 'hidden' }}>
+                  <Image src={cat.photo} alt={cat.label} fill sizes="300px" style={{ objectFit: 'cover' }} />
+                  <div style={{ position: 'absolute', inset: 0, background: 'rgba(10,22,40,0.45)' }} />
+                  <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(10,22,40,0.9) 0%, transparent 60%)' }} />
+                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '28px 24px' }}>
+                    <p style={{ fontFamily: 'var(--font-dm-sans, sans-serif)', fontSize: '11px', fontWeight: '500', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#c9a84c', margin: '0 0 6px' }}>{cat.count}</p>
+                    <h3 style={{ fontFamily: 'var(--font-playfair, serif)', fontSize: '1.4rem', fontWeight: '500', color: '#f8f9fa', margin: '0 0 6px' }}>{cat.label}</h3>
+                    <p style={{ fontFamily: 'var(--font-dm-sans, sans-serif)', fontSize: '12px', color: 'rgba(248,249,250,0.5)', margin: 0, fontWeight: '300' }}>{cat.desc}</p>
+                  </div>
+                </div>
+              </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── Latest Catches ──────────────────────── */}
+      {/* Latest Catches */}
       <LatestCatches />
 
-      {/* ── Footer ─────────────────────────────── */}
-      <footer style={{
-        borderTop: '1px solid #162a4a',
-        padding: '32px 48px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        flexWrap: 'wrap',
-        gap: '16px',
-      }}>
-        <span style={{
-          fontFamily: 'var(--font-playfair, serif)',
-          fontSize: '1rem',
-          color: 'rgba(143,163,184,0.35)',
-        }}>
-          Seaitall
-        </span>
-        <span style={{
-          fontFamily: 'var(--font-dm-sans, sans-serif)',
-          fontSize: '12px',
-          color: 'rgba(143,163,184,0.35)',
-          letterSpacing: '0.06em',
-        }}>
-          © 2025 Seaitall — The world's fishing platform
-        </span>
-        <div style={{ display: 'flex', gap: '28px' }}>
-          <Link href="/browse" className="nav-link">Browse</Link>
-          <Link href="/catches" className="nav-link">Catches</Link>
-          <Link href="/listings/new" className="nav-link">Sell</Link>
-          <Link href="/auth/signup" className="nav-link">Join</Link>
+      {/* ── BOTTOM CTA ──────────────────────────────── */}
+      <section style={{ padding: '100px 48px', textAlign: 'center', borderTop: '1px solid #162a4a' }}>
+        <div style={{ maxWidth: '640px', margin: '0 auto' }}>
+          <p style={{ fontFamily: 'var(--font-dm-sans, sans-serif)', fontSize: '11px', fontWeight: '500', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(201,168,76,0.6)', marginBottom: '20px' }}>Join the community</p>
+          <h2 style={{ fontFamily: 'var(--font-playfair, serif)', fontSize: '2.8rem', fontWeight: '400', color: '#f8f9fa', marginBottom: '20px', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
+            The fishing world<br />in one place.
+          </h2>
+          <p style={{ fontFamily: 'var(--font-dm-sans, sans-serif)', fontSize: '15px', fontWeight: '300', color: 'rgba(143,163,184,0.55)', lineHeight: 1.7, marginBottom: '40px' }}>
+            Buy and sell gear, find charters, log your catches, and connect with anglers everywhere.
+          </p>
+          <div style={{ display: 'flex', gap: '14px', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <Link href="/browse" className="btn-primary" style={{ padding: '15px 36px', fontSize: '15px' }}>Browse Gear</Link>
+            <Link href="/auth/signup" className="btn-ghost" style={{ padding: '14px 36px', fontSize: '15px' }}>Sign Up Free</Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── FOOTER ──────────────────────────────────── */}
+      <footer style={{ borderTop: '1px solid #162a4a', padding: '48px', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '40px' }}>
+        <div>
+          <span style={{ fontFamily: 'var(--font-playfair, serif)', fontSize: '1.2rem', color: '#f8f9fa', display: 'block', marginBottom: '12px' }}>Seaitall</span>
+          <p style={{ fontFamily: 'var(--font-dm-sans, sans-serif)', fontSize: '13px', fontWeight: '300', color: 'rgba(143,163,184,0.4)', lineHeight: 1.6, margin: 0 }}>The world's fishing marketplace.</p>
+        </div>
+        <div>
+          <p style={{ fontFamily: 'var(--font-dm-sans, sans-serif)', fontSize: '11px', fontWeight: '500', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(143,163,184,0.3)', marginBottom: '16px' }}>Marketplace</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {[['Browse Gear','/browse'],['Sell Gear','/listings/new'],['Charters','/charters'],['Catch Log','/catches']].map(([l,h]) => (
+              <Link key={h} href={h} className="nav-link" style={{ fontSize: '13px', fontWeight: '300' }}>{l}</Link>
+            ))}
+          </div>
+        </div>
+        <div>
+          <p style={{ fontFamily: 'var(--font-dm-sans, sans-serif)', fontSize: '11px', fontWeight: '500', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(143,163,184,0.3)', marginBottom: '16px' }}>Account</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {[['Sign Up','/auth/signup'],['Log In','/auth/login'],['Messages','/messages'],['Notifications','/notifications']].map(([l,h]) => (
+              <Link key={h} href={h} className="nav-link" style={{ fontSize: '13px', fontWeight: '300' }}>{l}</Link>
+            ))}
+          </div>
         </div>
       </footer>
+      <div style={{ borderTop: '1px solid #162a4a', padding: '20px 48px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+        <span style={{ fontFamily: 'var(--font-dm-sans, sans-serif)', fontSize: '12px', color: 'rgba(143,163,184,0.25)' }}>© 2025 Seaitall</span>
+        <div style={{ display: 'flex', gap: '24px' }}>
+          <Link href="/browse" className="nav-link" style={{ fontSize: '12px', color: 'rgba(143,163,184,0.25)' }}>Browse</Link>
+          <Link href="/catches" className="nav-link" style={{ fontSize: '12px', color: 'rgba(143,163,184,0.25)' }}>Catches</Link>
+        </div>
+      </div>
     </main>
   )
 }
