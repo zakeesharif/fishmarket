@@ -10,13 +10,13 @@ import { useAuth } from '@/components/AuthProvider'
 import { useToast } from '@/components/Toast'
 
 const CATEGORY_PHOTOS = {
-  'Rods':         'https://images.unsplash.com/photo-1608731267464-ba3536e8f5a4?w=800&auto=format&fit=crop',
-  'Reels':        'https://images.unsplash.com/photo-1608731267464-ba3536e8f5a4?w=800&auto=format&fit=crop',
-  'Lures':        'https://images.unsplash.com/photo-1608731267464-ba3536e8f5a4?w=800&auto=format&fit=crop',
+  'Rods':         'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&auto=format&fit=crop',
+  'Reels':        'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&auto=format&fit=crop',
+  'Lures':        'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&auto=format&fit=crop',
   'Boats':        'https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=800&auto=format&fit=crop',
   'Engines':      'https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=800&auto=format&fit=crop',
-  'Tackle Boxes': 'https://images.unsplash.com/photo-1608731267464-ba3536e8f5a4?w=800&auto=format&fit=crop',
-  'Line':         'https://images.unsplash.com/photo-1608731267464-ba3536e8f5a4?w=800&auto=format&fit=crop',
+  'Tackle Boxes': 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&auto=format&fit=crop',
+  'Line':         'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&auto=format&fit=crop',
   'Other':        'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&auto=format&fit=crop',
   'default':      'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&auto=format&fit=crop',
 }
