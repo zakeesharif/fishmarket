@@ -28,13 +28,13 @@ const CONDITION_COLORS = {
   'Poor':     { bg: 'rgba(180,80,80,0.1)',   text: 'rgba(220,100,100,0.9)', border: 'rgba(180,80,80,0.25)' },
 }
 const CATEGORY_PHOTOS = {
-  'Rods':         'https://images.unsplash.com/photo-1542621334-a254cf47733d?w=800&auto=format&fit=crop',
-  'Reels':        'https://images.unsplash.com/photo-1542621334-a254cf47733d?w=800&auto=format&fit=crop',
-  'Lures':        'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&auto=format&fit=crop',
+  'Rods':         'https://images.unsplash.com/photo-1608731267464-ba3536e8f5a4?w=800&auto=format&fit=crop',
+  'Reels':        'https://images.unsplash.com/photo-1608731267464-ba3536e8f5a4?w=800&auto=format&fit=crop',
+  'Lures':        'https://images.unsplash.com/photo-1608731267464-ba3536e8f5a4?w=800&auto=format&fit=crop',
   'Boats':        'https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=800&auto=format&fit=crop',
   'Engines':      'https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=800&auto=format&fit=crop',
-  'Tackle Boxes': 'https://images.unsplash.com/photo-1542621334-a254cf47733d?w=800&auto=format&fit=crop',
-  'Line':         'https://images.unsplash.com/photo-1542621334-a254cf47733d?w=800&auto=format&fit=crop',
+  'Tackle Boxes': 'https://images.unsplash.com/photo-1608731267464-ba3536e8f5a4?w=800&auto=format&fit=crop',
+  'Line':         'https://images.unsplash.com/photo-1608731267464-ba3536e8f5a4?w=800&auto=format&fit=crop',
   'Other':        'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&auto=format&fit=crop',
 }
 const DRAFT_KEY = 'seaitall_listing_draft'

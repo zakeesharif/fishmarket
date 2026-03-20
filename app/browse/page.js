@@ -10,14 +10,15 @@ import { useAuth } from '@/components/AuthProvider'
 import { useToast } from '@/components/Toast'
 
 const CATEGORY_PHOTOS = {
-  'Rods':         'https://images.unsplash.com/photo-1542621334-a254cf47733d?w=800&auto=format&fit=crop',
-  'Reels':        'https://images.unsplash.com/photo-1542621334-a254cf47733d?w=800&auto=format&fit=crop',
-  'Lures':        'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&auto=format&fit=crop',
+  'Rods':         'https://images.unsplash.com/photo-1608731267464-ba3536e8f5a4?w=800&auto=format&fit=crop',
+  'Reels':        'https://images.unsplash.com/photo-1608731267464-ba3536e8f5a4?w=800&auto=format&fit=crop',
+  'Lures':        'https://images.unsplash.com/photo-1608731267464-ba3536e8f5a4?w=800&auto=format&fit=crop',
   'Boats':        'https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=800&auto=format&fit=crop',
   'Engines':      'https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=800&auto=format&fit=crop',
-  'Tackle Boxes': 'https://images.unsplash.com/photo-1542621334-a254cf47733d?w=800&auto=format&fit=crop',
-  'Line':         'https://images.unsplash.com/photo-1542621334-a254cf47733d?w=800&auto=format&fit=crop',
+  'Tackle Boxes': 'https://images.unsplash.com/photo-1608731267464-ba3536e8f5a4?w=800&auto=format&fit=crop',
+  'Line':         'https://images.unsplash.com/photo-1608731267464-ba3536e8f5a4?w=800&auto=format&fit=crop',
   'Other':        'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&auto=format&fit=crop',
+  'default':      'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&auto=format&fit=crop',
 }
 const CATEGORIES = ['All','Rods','Reels','Lures','Line','Tackle Boxes','Boats','Engines','Other']
 const CONDITIONS = ['New','Like New','Good','Fair','Poor']
@@ -51,7 +52,7 @@ function timeAgo(dateStr) {
 
 function ListingCard({ listing, onSave, savedIds }) {
   const cond = CONDITION_COLORS[listing.condition] || CONDITION_COLORS['Good']
-  const photo = listing.photo_url || (listing.photos && listing.photos[0]) || CATEGORY_PHOTOS[listing.category] || CATEGORY_PHOTOS['Other']
+  const photo = listing.photo_url || CATEGORY_PHOTOS[listing.category] || CATEGORY_PHOTOS['default']
   const isSaved = savedIds?.has(listing.id)
 
   return (
