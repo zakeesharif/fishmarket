@@ -27,16 +27,15 @@ const CONDITION_COLORS = {
   'Fair':     { bg: 'rgba(200,160,80,0.08)', text: 'rgba(200,160,80,0.8)', border: 'rgba(200,160,80,0.2)' },
   'Poor':     { bg: 'rgba(180,80,80,0.1)',   text: 'rgba(220,100,100,0.9)', border: 'rgba(180,80,80,0.25)' },
 }
-const UNSPLASH = (id) => `https://images.unsplash.com/${id}?w=600&auto=format&fit=crop`
 const CATEGORY_PHOTOS = {
-  'Rods':         UNSPLASH('photo-1544551763-46a013bb70d5'),
-  'Reels':        UNSPLASH('photo-1571019613454-1cb2f99b2d8b'),
-  'Lures':        UNSPLASH('photo-1578662996442-48f60103fc96'),
-  'Boats':        UNSPLASH('photo-1567899378494-47b22a2ae96a'),
-  'Engines':      UNSPLASH('photo-1558618666-fcd25c85cd64'),
-  'Tackle Boxes': UNSPLASH('photo-1544551763-46a013bb70d5'),
-  'Line':         UNSPLASH('photo-1544551763-46a013bb70d5'),
-  'Other':        UNSPLASH('photo-1544551763-46a013bb70d5'),
+  'Rods':         'https://images.unsplash.com/photo-1542621334-a254cf47733d?w=800&auto=format&fit=crop',
+  'Reels':        'https://images.unsplash.com/photo-1542621334-a254cf47733d?w=800&auto=format&fit=crop',
+  'Lures':        'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&auto=format&fit=crop',
+  'Boats':        'https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=800&auto=format&fit=crop',
+  'Engines':      'https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=800&auto=format&fit=crop',
+  'Tackle Boxes': 'https://images.unsplash.com/photo-1542621334-a254cf47733d?w=800&auto=format&fit=crop',
+  'Line':         'https://images.unsplash.com/photo-1542621334-a254cf47733d?w=800&auto=format&fit=crop',
+  'Other':        'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&auto=format&fit=crop',
 }
 const DRAFT_KEY = 'seaitall_listing_draft'
 const TOTAL_STEPS = 5
@@ -266,8 +265,6 @@ export default function NewListingPage() {
         location: form.location.trim() || null,
         category,
         photo_url: uploadedUrls[0] || null,
-        photos: uploadedUrls.length > 0 ? uploadedUrls : null,
-        status: 'active',
       }).select('id').single()
 
       if (insertErr) throw new Error(insertErr.message)

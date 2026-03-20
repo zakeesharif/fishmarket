@@ -9,16 +9,15 @@ import { createClient } from '@/lib/supabase/client'
 import { useAuth } from '@/components/AuthProvider'
 import { useToast } from '@/components/Toast'
 
-const UNSPLASH = (id) => `https://images.unsplash.com/${id}?w=600&auto=format&fit=crop`
 const CATEGORY_PHOTOS = {
-  'Rods':         UNSPLASH('photo-1544551763-46a013bb70d5'),
-  'Reels':        UNSPLASH('photo-1571019613454-1cb2f99b2d8b'),
-  'Lures':        UNSPLASH('photo-1578662996442-48f60103fc96'),
-  'Boats':        UNSPLASH('photo-1567899378494-47b22a2ae96a'),
-  'Engines':      UNSPLASH('photo-1558618666-fcd25c85cd64'),
-  'Tackle Boxes': UNSPLASH('photo-1544551763-46a013bb70d5'),
-  'Line':         UNSPLASH('photo-1544551763-46a013bb70d5'),
-  'Other':        UNSPLASH('photo-1544551763-46a013bb70d5'),
+  'Rods':         'https://images.unsplash.com/photo-1542621334-a254cf47733d?w=800&auto=format&fit=crop',
+  'Reels':        'https://images.unsplash.com/photo-1542621334-a254cf47733d?w=800&auto=format&fit=crop',
+  'Lures':        'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&auto=format&fit=crop',
+  'Boats':        'https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=800&auto=format&fit=crop',
+  'Engines':      'https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=800&auto=format&fit=crop',
+  'Tackle Boxes': 'https://images.unsplash.com/photo-1542621334-a254cf47733d?w=800&auto=format&fit=crop',
+  'Line':         'https://images.unsplash.com/photo-1542621334-a254cf47733d?w=800&auto=format&fit=crop',
+  'Other':        'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&auto=format&fit=crop',
 }
 const CATEGORIES = ['All','Rods','Reels','Lures','Line','Tackle Boxes','Boats','Engines','Other']
 const CONDITIONS = ['New','Like New','Good','Fair','Poor']
@@ -156,8 +155,7 @@ function BrowsePageInner() {
       const supabase = createClient()
       let query = supabase
         .from('listings')
-        .select('id,title,price,condition,category,location,photo_url,photos,views,saves,created_at,user_id,seller_email', { count: 'exact' })
-        .eq('status', 'active')
+        .select('id,title,price,condition,category,location,photo_url,created_at,user_id,seller_email', { count: 'exact' })
 
       if (category !== 'All') query = query.eq('category', category)
       if (conditions.length > 0) query = query.in('condition', conditions)
@@ -169,8 +167,8 @@ function BrowsePageInner() {
       switch (sort) {
         case 'price_asc':  query = query.order('price', { ascending: true }); break
         case 'price_desc': query = query.order('price', { ascending: false }); break
-        case 'views':      query = query.order('views', { ascending: false }); break
-        case 'saves':      query = query.order('saves', { ascending: false }); break
+        case 'views':      query = query.order('created_at', { ascending: false }); break
+        case 'saves':      query = query.order('created_at', { ascending: false }); break
         default:           query = query.order('created_at', { ascending: false })
       }
 
@@ -192,6 +190,7 @@ function BrowsePageInner() {
       if (replace) setListings(enriched)
       else setListings(prev => [...prev, ...enriched])
     } catch (err) {
+      console.error('Browse fetch error:', err)
       addToast('Failed to load listings', 'error')
     } finally {
       setLoading(false)
