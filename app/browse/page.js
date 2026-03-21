@@ -91,9 +91,17 @@ function ListingCard({ listing, onSave, savedIds }) {
           <span style={{ fontFamily: 'var(--font-playfair, serif)', fontSize: '16px', color: '#c9a84c', fontWeight: '500' }}>
             ${Number(listing.price).toLocaleString()}
           </span>
-          <span style={{ fontFamily: 'var(--font-dm-sans, sans-serif)', fontSize: '11px', color: 'rgba(143,163,184,0.3)' }}>
-            {timeAgo(listing.created_at)}
-          </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {listing.views > 0 && (
+              <span style={{ fontFamily: 'var(--font-dm-sans, sans-serif)', fontSize: '10px', color: 'rgba(143,163,184,0.25)', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                {listing.views}
+              </span>
+            )}
+            <span style={{ fontFamily: 'var(--font-dm-sans, sans-serif)', fontSize: '11px', color: 'rgba(143,163,184,0.3)' }}>
+              {timeAgo(listing.created_at)}
+            </span>
+          </div>
         </div>
 
         {listing.location && (
@@ -156,7 +164,8 @@ function BrowsePageInner() {
       const supabase = createClient()
       let query = supabase
         .from('listings')
-        .select('id,title,price,condition,category,location,photo_url,created_at,user_id', { count: 'exact' })
+        .select('id,title,price,condition,category,location,photo_url,created_at,user_id,views,saves,status', { count: 'exact' })
+        .eq('status', 'active')
 
       if (category !== 'All') query = query.eq('category', category)
       if (conditions.length > 0) query = query.in('condition', conditions)
@@ -168,8 +177,8 @@ function BrowsePageInner() {
       switch (sort) {
         case 'price_asc':  query = query.order('price', { ascending: true }); break
         case 'price_desc': query = query.order('price', { ascending: false }); break
-        case 'views':      query = query.order('created_at', { ascending: false }); break
-        case 'saves':      query = query.order('created_at', { ascending: false }); break
+        case 'views':      query = query.order('views', { ascending: false }); break
+        case 'saves':      query = query.order('saves', { ascending: false }); break
         default:           query = query.order('created_at', { ascending: false })
       }
 
