@@ -144,6 +144,7 @@ export default function Navbar() {
           <Link href="/browse?category=Boats" className="nav-link">Boats</Link>
           <Link href="/charters" className={`nav-link${pathname.startsWith('/charters') ? ' active' : ''}`}>Charters</Link>
           <Link href="/catches" className={`nav-link${pathname.startsWith('/catches') ? ' active' : ''}`}>Catches</Link>
+          <Link href="/leaderboard" className={`nav-link${pathname === '/leaderboard' ? ' active' : ''}`}>Leaderboard</Link>
         </div>
 
         {/* Right: search + auth */}
@@ -211,6 +212,14 @@ export default function Navbar() {
               {/* Sell gear */}
               <Link href="/listings/new" className="btn-primary" style={{ padding: '8px 18px', fontSize: '12px' }}>
                 Sell Gear
+              </Link>
+
+              {/* Dashboard */}
+              <Link href="/dashboard" style={{ fontFamily: 'var(--font-dm-sans, sans-serif)', fontSize: '12px', color: pathname === '/dashboard' ? '#c9a84c' : 'rgba(143,163,184,0.6)', fontWeight: '400', letterSpacing: '0.03em', transition: 'color 0.15s' }}
+                onMouseEnter={(e) => e.currentTarget.style.color = '#f8f9fa'}
+                onMouseLeave={(e) => e.currentTarget.style.color = pathname === '/dashboard' ? '#c9a84c' : 'rgba(143,163,184,0.6)'}
+              >
+                Dashboard
               </Link>
 
               {/* Avatar dropdown */}
