@@ -75,7 +75,7 @@ export default function Home() {
       <HomepageDynamic />
 
       {/* ── CATEGORIES ──────────────────────────────── */}
-      <section style={{ padding: '80px 48px' }}>
+      <section className="section-pad" style={{ padding: '80px 48px' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '40px', flexWrap: 'wrap', gap: '16px' }}>
             <h2 style={{ fontFamily: 'var(--font-playfair, serif)', fontSize: '2rem', fontWeight: '400', color: '#f8f9fa', letterSpacing: '-0.01em' }}>Everything you need</h2>
@@ -105,7 +105,7 @@ export default function Home() {
       <LatestCatches />
 
       {/* ── BOTTOM CTA ──────────────────────────────── */}
-      <section style={{ padding: '100px 48px', textAlign: 'center', borderTop: '1px solid #162a4a' }}>
+      <section className="section-pad" style={{ padding: '100px 48px', textAlign: 'center', borderTop: '1px solid #162a4a' }}>
         <div style={{ maxWidth: '640px', margin: '0 auto' }}>
           <p style={{ fontFamily: 'var(--font-dm-sans, sans-serif)', fontSize: '11px', fontWeight: '500', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(201,168,76,0.6)', marginBottom: '20px' }}>Join the community</p>
           <h2 style={{ fontFamily: 'var(--font-playfair, serif)', fontSize: '2.8rem', fontWeight: '400', color: '#f8f9fa', marginBottom: '20px', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
@@ -122,7 +122,7 @@ export default function Home() {
       </section>
 
       {/* ── FOOTER ──────────────────────────────────── */}
-      <footer style={{ borderTop: '1px solid #162a4a', padding: '48px', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '40px' }}>
+      <footer className="footer-grid" style={{ borderTop: '1px solid #162a4a', padding: '48px', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '40px' }}>
         <div>
           <span style={{ fontFamily: 'var(--font-playfair, serif)', fontSize: '1.2rem', color: '#f8f9fa', display: 'block', marginBottom: '12px' }}>Seaitall</span>
           <p style={{ fontFamily: 'var(--font-dm-sans, sans-serif)', fontSize: '13px', fontWeight: '300', color: 'rgba(143,163,184,0.4)', lineHeight: 1.6, margin: 0 }}>The world's fishing marketplace.</p>
@@ -144,7 +144,7 @@ export default function Home() {
           </div>
         </div>
       </footer>
-      <div style={{ borderTop: '1px solid #162a4a', padding: '20px 48px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+      <div className="footer-bottom" style={{ borderTop: '1px solid #162a4a', padding: '20px 48px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
         <span style={{ fontFamily: 'var(--font-dm-sans, sans-serif)', fontSize: '12px', color: 'rgba(143,163,184,0.25)' }}>© 2025 Seaitall</span>
         <div style={{ display: 'flex', gap: '24px' }}>
           <Link href="/browse" className="nav-link" style={{ fontSize: '12px', color: 'rgba(143,163,184,0.25)' }}>Browse</Link>
