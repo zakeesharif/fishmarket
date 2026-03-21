@@ -10,15 +10,15 @@ import { useAuth } from '@/components/AuthProvider'
 import { useToast } from '@/components/Toast'
 
 const CATEGORY_PHOTOS = {
-  'Rods':         'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&auto=format&fit=crop',
-  'Reels':        'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&auto=format&fit=crop',
-  'Lures':        'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&auto=format&fit=crop',
-  'Boats':        'https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=800&auto=format&fit=crop',
-  'Engines':      'https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=800&auto=format&fit=crop',
-  'Tackle Boxes': 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&auto=format&fit=crop',
-  'Line':         'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&auto=format&fit=crop',
-  'Other':        'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&auto=format&fit=crop',
-  'default':      'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&auto=format&fit=crop',
+  'Rods':         'https://images.unsplash.com/photo-1529230117010-b6c436154f25?w=800&auto=format&fit=crop',
+  'Reels':        'https://images.unsplash.com/photo-1650081484358-b338642813c0?w=800&auto=format&fit=crop',
+  'Lures':        'https://images.unsplash.com/photo-1592929043000-fbea34bc8ad5?w=800&auto=format&fit=crop',
+  'Boats':        'https://images.unsplash.com/photo-1507124441518-c9584b9dc520?w=800&auto=format&fit=crop',
+  'Engines':      'https://images.unsplash.com/photo-1685720543627-a49e4754dd0a?w=800&auto=format&fit=crop',
+  'Tackle Boxes': 'https://images.unsplash.com/photo-1586920917141-71ffe0798441?w=800&auto=format&fit=crop',
+  'Line':         'https://images.unsplash.com/photo-1593442998882-7cb49031174b?w=800&auto=format&fit=crop',
+  'Other':        'https://images.unsplash.com/photo-1541742425281-c1d3fc8aff96?w=800&auto=format&fit=crop',
+  'default':      'https://images.unsplash.com/photo-1610741620547-1191d693e43d?w=800&auto=format&fit=crop',
 }
 const CATEGORIES = ['All','Rods','Reels','Lures','Line','Tackle Boxes','Boats','Engines','Other']
 const CONDITIONS = ['New','Like New','Good','Fair','Poor']
@@ -327,8 +327,9 @@ function BrowsePageInner() {
               {SORTS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
             </select>
             {/* Mobile filter toggle */}
-            <button onClick={() => setMobileFiltersOpen(true)} className="btn-secondary" style={{ display: 'none' }} id="mobile-filter-btn">
-              Filters
+            <button onClick={() => setMobileFiltersOpen(true)} className="btn-secondary mobile-filter-btn" style={{ display: 'none' }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/></svg>
+              Filters {(conditions.length > 0 || priceMin || priceMax || location) ? `(${conditions.length + (priceMin?1:0) + (priceMax?1:0) + (location?1:0)})` : ''}
             </button>
             <Link href="/listings/new" className="btn-primary" style={{ padding: '10px 20px', fontSize: '13px' }}>Sell Gear</Link>
           </div>
@@ -354,10 +355,23 @@ function BrowsePageInner() {
           </div>
         )}
 
+        {/* Mobile filter drawer overlay */}
+        <div className={`mobile-filter-overlay${mobileFiltersOpen ? ' open' : ''}`} onClick={() => setMobileFiltersOpen(false)} />
+        <div className={`mobile-filter-drawer${mobileFiltersOpen ? ' open' : ''}`}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+            <span style={{ fontFamily: 'var(--font-dm-sans, sans-serif)', fontSize: '13px', fontWeight: '500', color: '#f8f9fa', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Filters</span>
+            <button onClick={() => setMobileFiltersOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(143,163,184,0.5)', padding: '4px' }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+          <FilterPanel />
+          <button onClick={() => setMobileFiltersOpen(false)} className="btn-primary" style={{ width: '100%', marginTop: '24px' }}>Show Results</button>
+        </div>
+
         {/* Main layout: sidebar + grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: '220px 1fr', gap: '40px', alignItems: 'start' }}>
+        <div className="browse-main-layout" style={{ display: 'grid', gridTemplateColumns: '220px 1fr', gap: '40px', alignItems: 'start' }}>
           {/* Sidebar filters (desktop) */}
-          <div style={{ position: 'sticky', top: '80px' }}>
+          <div className="browse-sidebar" style={{ position: 'sticky', top: '80px' }}>
             <FilterPanel />
           </div>
 
