@@ -19,18 +19,27 @@ const dmSans = DM_Sans({
 })
 
 export const metadata = {
-  metadataBase: new URL('https://seaitall.com'),
+  metadataBase: new URL('https://seaitall-qb0wo6vmp-zakeesharif-7018s-projects.vercel.app'),
   title: {
     default: 'Seaitall — The World\'s Fishing Marketplace',
     template: '%s — Seaitall',
   },
   description: 'Buy and sell fishing gear, find charters, book guides, and log your catches. Seaitall is the world\'s fishing marketplace.',
+  keywords: ['fishing gear', 'fishing marketplace', 'buy fishing equipment', 'sell fishing gear', 'fishing rods', 'fishing reels', 'fishing charters', 'fishing boats', 'tackle', 'lures', 'anglers'],
+  robots: { index: true, follow: true },
   openGraph: {
     siteName: 'Seaitall',
     type: 'website',
-    images: [{ url: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200&auto=format&fit=crop' }],
+    title: 'Seaitall — The World\'s Fishing Marketplace',
+    description: 'Buy and sell fishing gear, find charters, book guides, and log your catches.',
+    images: [{ url: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200&auto=format&fit=crop', width: 1200, height: 630, alt: 'Seaitall — The World\'s Fishing Marketplace' }],
   },
-  twitter: { card: 'summary_large_image' },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Seaitall — The World\'s Fishing Marketplace',
+    description: 'Buy and sell fishing gear, find charters, book guides, and log your catches.',
+    images: ['https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200&auto=format&fit=crop'],
+  },
 }
 
 export default function RootLayout({ children }) {
