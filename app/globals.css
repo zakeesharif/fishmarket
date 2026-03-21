@@ -203,7 +203,7 @@ select.fm-input { cursor: pointer; }
   box-shadow: var(--shadow-md);
 }
 
-/* ─────────────────────────────────────────────
+/* ──────────────────────────────────────────────
    Masonry
 ───────────────────────────────────────────── */
 .masonry-grid {
@@ -483,6 +483,17 @@ main { animation: pageFadeIn 0.2s ease; }
 
   .two-col { grid-template-columns: 1fr !important; }
 
+  /* Browse page */
+  .browse-main-layout  { grid-template-columns: 1fr !important; }
+  .browse-sidebar      { display: none !important; }
+  .browse-sidebar.mobile-open { display: block !important; }
+  .mobile-filter-btn   { display: flex !important; }
+
+  /* Footer & sections */
+  .footer-grid { grid-template-columns: 1fr !important; gap: 28px !important; padding: 40px 24px !important; }
+  .footer-bottom { padding: 16px 24px !important; flex-direction: column !important; gap: 8px !important; }
+  .section-pad { padding-left: 24px !important; padding-right: 24px !important; }
+
   main { padding-bottom: 70px; }
 
   /* Bottom nav */
@@ -525,3 +536,27 @@ main { animation: pageFadeIn 0.2s ease; }
 @media (max-width: 480px) {
   .masonry-grid { column-count: 1; }
 }
+
+/* ─────────────────────────────────────────────
+   Mobile Filter Drawer
+───────────────────────────────────────────── */
+.mobile-filter-drawer {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 500;
+  background: var(--bg-primary);
+  overflow-y: auto;
+  padding: 24px;
+  padding-bottom: 80px;
+}
+.mobile-filter-drawer.open { display: block; }
+.mobile-filter-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 490;
+  backdrop-filter: blur(4px);
+}
+.mobile-filter-overlay.open { display: block; }
